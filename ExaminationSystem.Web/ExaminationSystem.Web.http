@@ -4,3 +4,4 @@ GET {{ExaminationSystem.Web_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+GET {{ExaminationSystem.Web_HostAddress}}/api/Subjects

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Services
+﻿namespace Services
 {
-    internal class ServiceManager
+    public class ServiceManager(IUnitOfWork unitOfWork,IMapper mapper) : IServiceManager
     {
+        private readonly Lazy<ISubjectService> _subjectService= new Lazy<ISubjectService>(() => new SubjectService(unitOfWork,mapper));
+        public ISubjectService SubjectService => _subjectService.Value;
     }
 }

@@ -1,6 +1,7 @@
 
 using Domain.Contracts;
 using Persistence;
+using Services;
 
 namespace ExaminationSystem.Web
 {
@@ -9,10 +10,14 @@ namespace ExaminationSystem.Web
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddInfrastructureServices(builder.Configuration);
 
             // Add services to the container.
             builder.Services.AddControllers();
+
+            //Register My Services
+            builder.Services.AddInfrastructureServices(builder.Configuration);
+            builder.Services.AddApplicationServices();
+
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 

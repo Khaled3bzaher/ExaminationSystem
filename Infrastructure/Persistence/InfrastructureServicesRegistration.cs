@@ -18,7 +18,8 @@ namespace Persistence
             {
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
             });
-            
+
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             ConfigureIdentity(services,configuration);
             return services;
