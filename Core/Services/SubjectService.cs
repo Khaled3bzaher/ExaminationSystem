@@ -1,13 +1,17 @@
 ﻿
 
 
+using Services.Specifications;
+using Shared.QueryParameters;
+
 namespace Services
 {
     internal class SubjectService(IUnitOfWork unitOfWork,IMapper mapper) : ISubjectService
     {
-        public async Task<IEnumerable<SubjectResponse>> GetAllSubjectsAsync()
+        public async Task<IEnumerable<SubjectResponse>> GetAllSubjectsAsync(SubjectQueryParameters parameters)
         {
-            var subjects = await unitOfWork.GetRepository<Subject, Guid>().GetAllAsync();
+            var specifications = new SubjectSpecifications(parameters);
+            var subjects = await unitOfWork.GetRepository<Subject, Guid>().GetAllAsync(specifications);
             return mapper.Map<IEnumerable<SubjectResponse>>(subjects);
         }
 
