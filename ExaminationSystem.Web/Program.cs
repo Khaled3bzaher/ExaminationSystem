@@ -1,5 +1,8 @@
 
 using Domain.Contracts;
+using ExaminationSystem.Web.Factories;
+using ExaminationSystem.Web.Middlewares;
+using Microsoft.AspNetCore.Mvc;
 using Persistence;
 using Services;
 
@@ -17,12 +20,15 @@ namespace ExaminationSystem.Web
             //Register My Services
             builder.Services.AddInfrastructureServices(builder.Configuration);
             builder.Services.AddApplicationServices();
-
+            builder.Services.AddWebApplicationServices();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
+            
+
             var app = builder.Build();
-            await InitializeDbAsync(app);
+            await app.InitializeDatabaseAsync();
+            app.UseMiddleware<CustomExceptionHandlerMiddleware>();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -39,11 +45,6 @@ namespace ExaminationSystem.Web
 
             app.Run();
         }
-        public static async Task InitializeDbAsync(WebApplication app)
-        {
-            using var scope = app.Services.CreateScope();
-            var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
-            await dbInitializer.InitializeAsync();
-        }
+        
     }
 }

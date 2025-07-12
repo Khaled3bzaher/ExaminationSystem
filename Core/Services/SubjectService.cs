@@ -1,6 +1,7 @@
 ﻿
 
 
+using Domain.Exceptions;
 using Services.Specifications;
 using Shared.DTOs;
 using Shared.QueryParameters;
@@ -21,7 +22,9 @@ namespace Services
 
         public async Task<SubjectResponse> GetSubjectAsync(Guid id)
         {
-            var subject = await unitOfWork.GetRepository<Subject,Guid>().GetAsync(id);
+            var subject = await unitOfWork.GetRepository<Subject, Guid>().GetAsync(id)
+                ?? throw new NotFoundException($"Subject with Id: {id} Not Found..!")
+                ;
             return mapper.Map<SubjectResponse>(subject);
         }
     }
