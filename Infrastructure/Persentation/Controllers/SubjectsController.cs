@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ServicesAbstractions;
+using Shared.DTOs;
 using Shared.DTOs.Subjects;
-using Shared.Options;
 using Shared.QueryParameters;
 
 namespace Persentation.Controllers
@@ -11,7 +11,7 @@ namespace Persentation.Controllers
     public class SubjectsController(IServiceManager serviceManager) : ControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<SubjectResponse>>> GetAllSubjects([FromQuery]SubjectQueryParameters parameters)
+        public async Task<ActionResult<PaginatedResponse<SubjectResponse>>> GetAllSubjects([FromQuery]SubjectQueryParameters parameters)
         {
             var subjects = await serviceManager.SubjectService.GetAllSubjectsAsync(parameters);
             return Ok(subjects);

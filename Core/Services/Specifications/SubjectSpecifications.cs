@@ -12,6 +12,7 @@ namespace Services.Specifications
         public SubjectSpecifications(SubjectQueryParameters parameters) : base(CreateCriteria(parameters))
         {
             ApplySorting(parameters.sorting);
+            ApplyPagination(parameters.PageSize, parameters.PageIndex);
         }
 
         private static Expression<Func<Subject,bool>> CreateCriteria(SubjectQueryParameters parameters)

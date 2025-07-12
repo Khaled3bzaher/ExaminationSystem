@@ -16,4 +16,8 @@
     <ProjectReference Include="..\ServicesAbstractions\ServicesAbstractions.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Validators\" />
+  </ItemGroup>
+
 </Project>
