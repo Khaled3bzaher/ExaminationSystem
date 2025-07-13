@@ -9,9 +9,18 @@ namespace Persistence.Repositories
         : IGenericRepository<TEntity, TKey>
         where TEntity : BaseEntityPrimaryKey<TKey>
     {
-        public async Task Add(TEntity entity) => await context.Set<TEntity>().AddAsync(entity);
-        public void Delete(TEntity entity) => context.Set<TEntity>().Remove(entity);
-        public void Update(TEntity entity) => context.Set<TEntity>().Update(entity);
+        public async Task AddAsync(TEntity entity) => await context.Set<TEntity>().AddAsync(entity);
+        public void Delete(TEntity entity) {
+            if (entity is BaseEntity<TKey> baseEntity)
+                baseEntity.DeletedAt = DateTime.UtcNow;
+            else
+                context.Set<TEntity>().Remove(entity);
+        }
+        public void Update(TEntity entity) {
+            if (entity is BaseEntity<TKey> baseEntity)
+                baseEntity.ModifiedAt = DateTime.UtcNow;
+            context.Set<TEntity>().Update(entity); 
+        }
         public async Task<IEnumerable<TEntity>> GetAllAsync(bool trackChanges = false)
         => trackChanges ?
             await context.Set<TEntity>().ToListAsync()
@@ -28,5 +37,7 @@ namespace Persistence.Repositories
 
         public async Task<int> CountAsync(ISpecifications<TEntity> specifications)
         => await SpecificationsEvaluator.CreateQuery(context.Set<TEntity>(), specifications).CountAsync();
+
+        
     }
 }

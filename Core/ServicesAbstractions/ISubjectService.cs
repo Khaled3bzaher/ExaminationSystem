@@ -8,5 +8,8 @@ namespace ServicesAbstractions
     {
         Task<PaginatedResponse<SubjectResponse>> GetAllSubjectsAsync(SubjectQueryParameters parameters);
         Task<SubjectResponse> GetSubjectAsync(Guid id);
+        Task<APIResponse<string>> CreateSubjectAsync(SubjectDTO subject);
+        Task<APIResponse<string>> UpdateSubjectAsync(Guid subjectId,SubjectDTO subject);
+        Task<APIResponse<string>> DeleteSubjectAsync(Guid subjectId);
     }
 }

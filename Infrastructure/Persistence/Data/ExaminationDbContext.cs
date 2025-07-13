@@ -18,6 +18,7 @@ namespace Persistence.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            //Identity Configurations
             modelBuilder.Entity<ApplicationUser>().ToTable("Users");
             modelBuilder.Entity<IdentityRole>().ToTable("Roles");
             modelBuilder.Entity<IdentityUserRole<string>>().ToTable("UserRoles");
@@ -27,6 +28,9 @@ namespace Persistence.Data
             
             modelBuilder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins");
             modelBuilder.Entity<IdentityUserToken<string>>().ToTable("UserTokens");
+
+            //Soft Delete Configurations
+            modelBuilder.Entity<Subject>().HasQueryFilter(s => s.DeletedAt == null);
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AssemblyReference).Assembly);
         }

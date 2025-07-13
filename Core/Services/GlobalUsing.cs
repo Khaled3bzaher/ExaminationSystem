@@ -4,4 +4,8 @@ global using AutoMapper;
 global using Domain.Contracts;
 global using Domain.Models;
 global using Shared.Options;
+global using FluentValidation;
+global using Domain.Constants;
+
+
 

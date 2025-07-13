@@ -1,11 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Services
 {
     public static class ApplicationServicesRegistration
     {
         /// <summary>
-        /// Add Auto Mapper And Service Manager
+        /// Add Auto Mapper, Fluent Validation And Service Manager
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
@@ -13,7 +15,8 @@ namespace Services
         {
             services.AddScoped<IServiceManager, ServiceManager>();
             services.AddAutoMapper(typeof(AssemblyReference).Assembly);
-
+            services.AddValidatorsFromAssembly(typeof(AssemblyReference).Assembly,includeInternalTypes:true);
+            services.AddFluentValidationAutoValidation();
             return services;
         }
     }
