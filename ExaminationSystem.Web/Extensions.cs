@@ -1,5 +1,6 @@
 ﻿using Domain.Contracts;
 using ExaminationSystem.Web.Factories;
+using ExaminationSystem.Web.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -14,6 +15,8 @@ namespace ExaminationSystem.Web
     {
         public static IServiceCollection AddWebApplicationServices(this  IServiceCollection services,IConfiguration configuration)
         {
+            services.AddExceptionHandler<GlobalExceptionHandler>();
+
             services.Configure<ApiBehaviorOptions>(options =>
             {
                 options.InvalidModelStateResponseFactory = APIResponseFactory.GenerateAPIValidationResponse;

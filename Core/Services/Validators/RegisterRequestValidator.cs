@@ -5,10 +5,13 @@
         public RegisterRequestValidator()
         {
             RuleFor(x => x.Email)
+                .Cascade(CascadeMode.Stop)
                 .NotEmpty().WithMessage("Email is required.")
                 .EmailAddress().WithMessage("Invalid email format.");
 
             RuleFor(x => x.Password)
+                .Cascade(CascadeMode.Stop)
+
                 .NotEmpty().WithMessage("Password is required.")
                 .MinimumLength(8).WithMessage("Password must be at least 8 characters.")
                 .Matches(@"[A-Z]").WithMessage("Password must contain at least one uppercase letter.")
@@ -17,6 +20,8 @@
                 .Matches(@"[@$!%*?&]").WithMessage("Password must contain at least one special character.");
 
             RuleFor(x => x.Name)
+                .Cascade(CascadeMode.Stop)
+
                 .NotEmpty().WithMessage("Name is required.")
                 .MinimumLength(ValidationConstants.MIN_NAME_LENGTH)
                 .WithMessage($"Min length for Name: {ValidationConstants.MIN_NAME_LENGTH}")
@@ -27,6 +32,8 @@
                 .Matches(@"^[\p{L} ]+$").WithMessage("Name must contain only letters (Arabic or English) and spaces.");
 
             RuleFor(x => x.PhoneNumber)
+                .Cascade(CascadeMode.Stop)
+
                 .NotEmpty().WithMessage("Phone number is required.")
                 .Matches(@"^01[0125][0-9]{8}$").WithMessage("Phone number must be a valid Egyptian number.");
         }

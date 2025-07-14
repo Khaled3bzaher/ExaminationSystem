@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Persentation.Extensions;
 using ServicesAbstractions;
-using Shared.Authentication;
 using Shared.DTOs;
 using Shared.DTOs.Subjects;
 using Shared.QueryParameters;
-using System.Security.Claims;
 
 namespace Persentation.Controllers
 {
@@ -14,35 +12,34 @@ namespace Persentation.Controllers
     public class SubjectsController(IServiceManager serviceManager) : ControllerBase
     {
         [HttpGet]
-        [Authorize(Roles = AppRoles.STUDENT)]
         public async Task<ActionResult<PaginatedResponse<SubjectResponse>>> GetAllSubjects([FromQuery] SubjectQueryParameters parameters)
         {
             var subjects = await serviceManager.SubjectService.GetAllSubjectsAsync(parameters);
             return Ok(subjects);
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult<SubjectResponse>> GetSubject(Guid id)
+        public async Task<IActionResult> GetSubject(Guid id)
         {
-            var subject = await serviceManager.SubjectService.GetSubjectAsync(id);
-            return Ok(subject);
+            var response = await serviceManager.SubjectService.GetSubjectAsync(id);
+            return response.ToActionResult();
         }
         [HttpPost]
-        public async Task<ActionResult<APIResponse<string>>> CreateSubject([FromBody] SubjectDTO subject)
+        public async Task<IActionResult> CreateSubject([FromBody] SubjectDTO subject)
         {
             var response = await serviceManager.SubjectService.CreateSubjectAsync(subject);
-            return Ok(response);
+            return response.ToActionResult();
         }
         [HttpPut("{Id:guid}")]
-        public async Task<ActionResult<APIResponse<string>>> UpdateSubject(Guid Id,[FromBody] SubjectDTO subject)
+        public async Task<IActionResult> UpdateSubject(Guid Id,[FromBody] SubjectDTO subject)
         {
             var response = await serviceManager.SubjectService.UpdateSubjectAsync(Id,subject);
-            return Ok(response);
+            return response.ToActionResult();
         }
         [HttpDelete("{Id:guid}")]
-        public async Task<ActionResult<APIResponse<string>>> DeleteSubject(Guid Id)
+        public async Task<IActionResult> DeleteSubject(Guid Id)
         {
             var response = await serviceManager.SubjectService.DeleteSubjectAsync(Id);
-            return Ok(response);
+            return response.ToActionResult();
         }
     }
 }

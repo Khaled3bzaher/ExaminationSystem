@@ -1,11 +1,12 @@
 ﻿using Shared.Authentication;
+using Shared.DTOs;
 
 namespace ServicesAbstractions
 {
     public interface IAuthenticationService
     {
-        Task<UserResponse> LoginAsync(LoginRequest loginRequest);
-        Task<UserResponse> RegisterAsync(RegisterRequest registerRequest);
+        Task<APIResponse<UserResponse>> LoginAsync(LoginRequest loginRequest);
+        Task<APIResponse<UserResponse>> RegisterAsync(RegisterRequest registerRequest);
         Task<bool> CheckEmailAsync(string email);
 
     }

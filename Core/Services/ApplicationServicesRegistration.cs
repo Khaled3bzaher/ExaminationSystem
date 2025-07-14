@@ -13,7 +13,7 @@ namespace Services
         {
             services.AddScoped<IServiceManager, ServiceManager>();
             services.AddAutoMapper(typeof(AssemblyReference).Assembly);
-            services.AddValidatorsFromAssembly(typeof(AssemblyReference).Assembly,includeInternalTypes:true);
+            services.AddValidatorsFromAssembly(typeof(AssemblyReference).Assembly, includeInternalTypes: true);
             services.AddFluentValidationAutoValidation();
             services.Configure<JWTOptions>(configuration.GetSection("JwtConfig"));
             return services;

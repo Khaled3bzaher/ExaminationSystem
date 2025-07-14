@@ -28,7 +28,7 @@ namespace ExaminationSystem.Web
 
             var app = builder.Build();
             await app.InitializeDatabaseAsync();
-            app.UseMiddleware<CustomExceptionHandlerMiddleware>();
+
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

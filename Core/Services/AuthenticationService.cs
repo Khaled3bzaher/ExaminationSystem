@@ -1,4 +1,6 @@
 ﻿
+using Shared.DTOs;
+using System.Net;
 using System.Text;
 
 namespace Services
@@ -8,18 +10,20 @@ namespace Services
         public async Task<bool> CheckEmailAsync(string email)
         => (await userManager.FindByEmailAsync(email)) != null;
         
-        public async Task<UserResponse> LoginAsync(LoginRequest loginRequest)
+        public async Task<APIResponse<UserResponse>> LoginAsync(LoginRequest loginRequest)
         {
-            var userFound = await userManager.FindByEmailAsync(loginRequest.Email)
-                ?? throw new NotFoundException($"User with Email: {loginRequest.Email} Not Found..!");
+            var userFound = await userManager.FindByEmailAsync(loginRequest.Email);
+            if (userFound is null)
+                return APIResponse<UserResponse>.FailureResponse($"User with Email: {loginRequest.Email} Not Found..!", (int)HttpStatusCode.NotFound);
 
             var loginValid = await userManager.CheckPasswordAsync(userFound, loginRequest.Password);
             if (loginValid && userFound.IsActive) // For User Set Active
-                return new(loginRequest.Email, userFound.FullName, await CreateTokenAsync(userFound));
-            throw new UnauthorizedException();
+                return APIResponse<UserResponse>.SuccessResponse(new UserResponse(loginRequest.Email, userFound.FullName, await CreateTokenAsync(userFound)));
+
+            return APIResponse<UserResponse>.FailureResponse("Invalid Email Or Password", (int)HttpStatusCode.Unauthorized);
         }
 
-        public async Task<UserResponse> RegisterAsync(RegisterRequest registerRequest)
+        public async Task<APIResponse<UserResponse>> RegisterAsync(RegisterRequest registerRequest)
         {
             var user = new ApplicationUser
             {
@@ -31,9 +35,11 @@ namespace Services
             var result = await userManager.CreateAsync(user,registerRequest.Password);
             var roleResult = await userManager.AddToRoleAsync(user, AppRoles.STUDENT);
             if (result.Succeeded && roleResult.Succeeded)
-                return new(registerRequest.Email, registerRequest.Name, await CreateTokenAsync(user));
+                return APIResponse<UserResponse>.SuccessResponse(new UserResponse(registerRequest.Email, registerRequest.Name, await CreateTokenAsync(user)));
+           
             var errors = result.Errors.Select(e => e.Description).ToList();
-            throw new BadRequestException(errors);
+
+            return APIResponse<UserResponse>.FailureResponse(errors.FirstOrDefault(),(int)HttpStatusCode.Conflict);
         }
         private async Task<string> CreateTokenAsync(ApplicationUser user)
         {

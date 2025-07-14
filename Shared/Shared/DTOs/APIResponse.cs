@@ -12,12 +12,20 @@ namespace Shared.DTOs
         public static APIResponse<T> SuccessResponse(T? data, string message = "")
         {
             return new APIResponse<T>
-            { Success = true, StatusCode = (int)HttpStatusCode.OK, Data = data, Message = message };
+            {   Success = true,
+                StatusCode = (int)HttpStatusCode.OK,
+                Data = data,
+                Message = message
+            };
         }
-        public static APIResponse<T> FailureResponse(int statusCode, string message)
+        public static APIResponse<T> FailureResponse(string message, int statusCode=(int)HttpStatusCode.InternalServerError)
         {
             return new APIResponse<T>
-            { Success = false, StatusCode = statusCode, Message = message };
+            { 
+                Success = false,
+                StatusCode = statusCode,
+                Message = message
+            };
         }
 
     }

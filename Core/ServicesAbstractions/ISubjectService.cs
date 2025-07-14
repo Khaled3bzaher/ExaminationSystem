@@ -7,7 +7,7 @@ namespace ServicesAbstractions
     public interface ISubjectService
     {
         Task<PaginatedResponse<SubjectResponse>> GetAllSubjectsAsync(SubjectQueryParameters parameters);
-        Task<SubjectResponse> GetSubjectAsync(Guid id);
+        Task<APIResponse<SubjectResponse>> GetSubjectAsync(Guid id);
         Task<APIResponse<string>> CreateSubjectAsync(SubjectDTO subject);
         Task<APIResponse<string>> UpdateSubjectAsync(Guid subjectId,SubjectDTO subject);
         Task<APIResponse<string>> DeleteSubjectAsync(Guid subjectId);
