@@ -19,8 +19,8 @@ namespace ExaminationSystem.Web
 
             //Register My Services
             builder.Services.AddInfrastructureServices(builder.Configuration);
-            builder.Services.AddApplicationServices();
-            builder.Services.AddWebApplicationServices();
+            builder.Services.AddApplicationServices(builder.Configuration);
+            builder.Services.AddWebApplicationServices(builder.Configuration);
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
@@ -38,6 +38,7 @@ namespace ExaminationSystem.Web
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

@@ -14,6 +14,7 @@ namespace Services
             await unitOfWork.GetRepository<Subject,Guid>().AddAsync(subjectMap);
             if(await unitOfWork.SaveChangesAsync() >0)
                 return APIResponse<string>.SuccessResponse(null,message:$"Subject {subject.Name} Successfully Created");
+
             throw new Exception("Something went wrong While Saving..!");
         }
 

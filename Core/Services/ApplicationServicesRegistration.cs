@@ -1,6 +1,4 @@
-﻿using FluentValidation;
-using FluentValidation.AspNetCore;
-using Microsoft.Extensions.DependencyInjection;
+﻿
 
 namespace Services
 {
@@ -11,12 +9,13 @@ namespace Services
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+        public static IServiceCollection AddApplicationServices(this IServiceCollection services,IConfiguration configuration)
         {
             services.AddScoped<IServiceManager, ServiceManager>();
             services.AddAutoMapper(typeof(AssemblyReference).Assembly);
             services.AddValidatorsFromAssembly(typeof(AssemblyReference).Assembly,includeInternalTypes:true);
             services.AddFluentValidationAutoValidation();
+            services.Configure<JWTOptions>(configuration.GetSection("JwtConfig"));
             return services;
         }
     }

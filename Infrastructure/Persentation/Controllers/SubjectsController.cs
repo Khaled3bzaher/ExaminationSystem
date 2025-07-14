@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ServicesAbstractions;
+using Shared.Authentication;
 using Shared.DTOs;
 using Shared.DTOs.Subjects;
 using Shared.QueryParameters;
+using System.Security.Claims;
 
 namespace Persentation.Controllers
 {
@@ -11,6 +14,7 @@ namespace Persentation.Controllers
     public class SubjectsController(IServiceManager serviceManager) : ControllerBase
     {
         [HttpGet]
+        [Authorize(Roles = AppRoles.STUDENT)]
         public async Task<ActionResult<PaginatedResponse<SubjectResponse>>> GetAllSubjects([FromQuery] SubjectQueryParameters parameters)
         {
             var subjects = await serviceManager.SubjectService.GetAllSubjectsAsync(parameters);
