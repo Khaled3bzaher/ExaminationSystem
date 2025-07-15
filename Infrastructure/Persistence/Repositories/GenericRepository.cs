@@ -1,11 +1,12 @@
-﻿using Domain.Contracts;
+﻿using AutoMapper;
+using Domain.Contracts;
 using Domain.Models.BaseEntities;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Data;
 
 namespace Persistence.Repositories
 {
-    public class GenericRepository<TEntity, TKey>(ExaminationDbContext context)
+    public class GenericRepository<TEntity, TKey>(ExaminationDbContext context,IMapper mapper)
         : IGenericRepository<TEntity, TKey>
         where TEntity : BaseEntityPrimaryKey<TKey>
     {
@@ -38,6 +39,10 @@ namespace Persistence.Repositories
         public async Task<int> CountAsync(ISpecifications<TEntity> specifications)
         => await SpecificationsEvaluator.CreateQuery(context.Set<TEntity>(), specifications).CountAsync();
 
-        
+        public async Task<TDto?> GetProjectedAsync<TDto>(ISpecifications<TEntity> specifications)
+        => await SpecificationsEvaluator.CreateQuery<TEntity,TDto>(context.Set<TEntity>(), specifications,mapper.ConfigurationProvider).FirstOrDefaultAsync();
+
+        public async Task<IEnumerable<TDto>> GetAllProjectedAsync<TDto>(ISpecifications<TEntity> specifications)
+            => await SpecificationsEvaluator.CreateQuery<TEntity, TDto>(context.Set<TEntity>(), specifications, mapper.ConfigurationProvider).ToListAsync();
     }
 }

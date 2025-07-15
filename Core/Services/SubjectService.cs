@@ -30,26 +30,29 @@ namespace Services
                 return APIResponse<string>.SuccessResponse(null, message: $"Subject {subjectFound.Name} Successfully Deleted");
             else
                 return APIResponse<string>.FailureResponse("Something went wrong While Saving..!");
+
         }
 
         public async Task<PaginatedResponse<SubjectResponse>> GetAllSubjectsAsync(SubjectQueryParameters parameters)
         {
             var specifications = new SubjectSpecifications(parameters);
-            var subjects = await unitOfWork.GetRepository<Subject, Guid>().GetAllAsync(specifications);
-            var data =  mapper.Map<IEnumerable<SubjectResponse>>(subjects);
-            var pageCount = data.Count();
+            var subjects = await unitOfWork.GetRepository<Subject, Guid>().GetAllProjectedAsync<SubjectResponse>(specifications);
+            //var data =  mapper.Map<IEnumerable<SubjectResponse>>(subjects);
+            var pageCount = subjects.Count();
             var totalCount = await unitOfWork.GetRepository<Subject, Guid>().CountAsync(new SubjectSpecificationsCount(parameters));
-            return new(parameters.PageIndex, pageCount, totalCount, data);
+            return new(parameters.PageIndex, pageCount, totalCount, subjects);
         }
 
         public async Task<APIResponse<SubjectResponse>> GetSubjectAsync(Guid id)
         {
-            var subject = await unitOfWork.GetRepository<Subject, Guid>().GetAsync(id);
+            var specifications = new SubjectSpecifications(id);
+
+            var subject = await unitOfWork.GetRepository<Subject, Guid>().GetProjectedAsync<SubjectResponse>(specifications);
 
             if (subject == null)
                 return APIResponse<SubjectResponse>.FailureResponse($"Subject with Id: {id} Not Found..!", (int)HttpStatusCode.NotFound);
 
-            return APIResponse<SubjectResponse>.SuccessResponse(mapper.Map<SubjectResponse>(subject));
+            return APIResponse<SubjectResponse>.SuccessResponse(subject);
         }
 
         public async Task<APIResponse<string>> UpdateSubjectAsync(Guid subjectId, SubjectDTO subject)

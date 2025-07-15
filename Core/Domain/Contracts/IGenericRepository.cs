@@ -11,8 +11,10 @@ namespace Domain.Contracts
     {
         Task<TEntity?> GetAsync(TKey id);
         Task<TEntity?> GetAsync(ISpecifications<TEntity> specifications);
+        Task<TDto?> GetProjectedAsync<TDto>(ISpecifications<TEntity> specifications);
         Task<IEnumerable<TEntity>> GetAllAsync(bool trackChanges = false);
         Task<IEnumerable<TEntity>> GetAllAsync(ISpecifications<TEntity> specifications);
+        Task<IEnumerable<TDto>> GetAllProjectedAsync<TDto>(ISpecifications<TEntity> specifications);
         void Delete(TEntity entity);
         Task AddAsync(TEntity entity);
         void Update(TEntity entity);

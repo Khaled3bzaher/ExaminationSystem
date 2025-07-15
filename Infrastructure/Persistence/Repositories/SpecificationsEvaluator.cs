@@ -1,4 +1,6 @@
-﻿using Domain.Contracts;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Domain.Contracts;
 using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Repositories
@@ -21,7 +23,11 @@ namespace Persistence.Repositories
             if (specifications.IsPaginated)
                 query = query.Skip(specifications.Skip).Take(specifications.Take);
 
+
                 return query;
         }
+        public static IQueryable<TDto> CreateQuery<T, TDto>(IQueryable<T> inputQuery, ISpecifications<T> specifications, IConfigurationProvider configuration) where T : class
+            => CreateQuery<T>(inputQuery, specifications).ProjectTo<TDto>(configuration);
+        
     }
 }
