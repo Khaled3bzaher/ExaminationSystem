@@ -2,7 +2,7 @@
 using Shared.DTOs.Subjects;
 using Shared.QueryParameters;
 
-namespace ServicesAbstractions
+namespace ServicesAbstractions.Interfaces
 {
     public interface ISubjectService
     {

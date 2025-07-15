@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Persentation.Extensions;
-using ServicesAbstractions;
+using ServicesAbstractions.Interfaces;
 using Shared.Authentication;
 
 namespace Persentation.Controllers

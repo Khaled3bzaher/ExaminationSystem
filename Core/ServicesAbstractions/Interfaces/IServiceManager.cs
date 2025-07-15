@@ -1,8 +1,9 @@
-﻿namespace ServicesAbstractions
+﻿namespace ServicesAbstractions.Interfaces
 {
     public interface IServiceManager
     {
         ISubjectService SubjectService { get; }
         IAuthenticationService AuthenticationService { get; }
+        IQuestionsService QuestionsService { get; }
     }
 }

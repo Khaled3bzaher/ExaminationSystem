@@ -1,7 +1,7 @@
 ﻿using Shared.Authentication;
 using Shared.DTOs;
 
-namespace ServicesAbstractions
+namespace ServicesAbstractions.Interfaces
 {
     public interface IAuthenticationService
     {

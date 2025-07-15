@@ -1,5 +1,8 @@
 ﻿
 
+using Services.Repositories;
+using ServicesAbstractions.Interfaces;
+
 namespace Services
 {
     public static class ApplicationServicesRegistration

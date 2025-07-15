@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Persentation.Extensions;
-using ServicesAbstractions;
-using Shared.DTOs;
-using Shared.DTOs.Subjects;
-using Shared.QueryParameters;
+﻿
+
+using ServicesAbstractions.Interfaces;
 
 namespace Persentation.Controllers
 {
@@ -30,9 +27,9 @@ namespace Persentation.Controllers
             return response.ToActionResult();
         }
         [HttpPut("{Id:guid}")]
-        public async Task<IActionResult> UpdateSubject(Guid Id,[FromBody] SubjectDTO subject)
+        public async Task<IActionResult> UpdateSubject(Guid Id, [FromBody] SubjectDTO subject)
         {
-            var response = await serviceManager.SubjectService.UpdateSubjectAsync(Id,subject);
+            var response = await serviceManager.SubjectService.UpdateSubjectAsync(Id, subject);
             return response.ToActionResult();
         }
         [HttpDelete("{Id:guid}")]

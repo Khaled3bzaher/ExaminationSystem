@@ -44,5 +44,8 @@ namespace Persistence.Repositories
 
         public async Task<IEnumerable<TDto>> GetAllProjectedAsync<TDto>(ISpecifications<TEntity> specifications)
             => await SpecificationsEvaluator.CreateQuery<TEntity, TDto>(context.Set<TEntity>(), specifications, mapper.ConfigurationProvider).ToListAsync();
+
+        public async Task<bool> isExists(TKey Id)
+            => await context.Set<TEntity>().AnyAsync(e=> e.Id.Equals(Id));
     }
 }

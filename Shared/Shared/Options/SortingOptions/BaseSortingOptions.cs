@@ -1,6 +1,6 @@
-﻿namespace Shared.Options
+﻿namespace Shared.Options.SortingOptions
 {
-    public enum SortingOptions
+    public enum BaseSortingOptions
     {
         NameAsc,
         NameDesc,

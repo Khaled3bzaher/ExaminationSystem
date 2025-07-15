@@ -17,5 +17,10 @@ global using System.Text;
 global using Microsoft.Extensions.Options;
 global using FluentValidation.AspNetCore;
 global using Microsoft.Extensions.DependencyInjection;
+global using ServicesAbstractions.Interfaces;
+global using Services.Specifications;
+global using Shared.DTOs;
+global using Shared.QueryParameters;
+global using System.Net;
 
 

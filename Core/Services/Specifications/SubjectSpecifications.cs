@@ -1,4 +1,5 @@
 ﻿
+using Shared.Options.SortingOptions;
 using Shared.QueryParameters;
 using System.Linq.Expressions;
 
@@ -20,20 +21,20 @@ namespace Services.Specifications
             return p => (string.IsNullOrWhiteSpace(parameters.search) || p.Name.ToLower().Contains(parameters.search.Trim().ToLower()));
         }
 
-        private void ApplySorting(SortingOptions sorting)
+        private void ApplySorting(BaseSortingOptions sorting)
         {
             switch (sorting)
             {
-                case SortingOptions.NameAsc:
+                case BaseSortingOptions.NameAsc:
                     AddOrderBy(p => p.Name);
                     break;
-                case SortingOptions.NameDesc:
+                case BaseSortingOptions.NameDesc:
                     AddOrderByDescending(p => p.Name);
                     break;
-                case SortingOptions.CreatedAtAsc:
+                case BaseSortingOptions.CreatedAtAsc:
                     AddOrderBy(p => p.CreatedAt);
                     break;
-                case SortingOptions.CreatedAtDesc:
+                case BaseSortingOptions.CreatedAtDesc:
                     AddOrderByDescending(p => p.CreatedAt);
                     break;
                 default:

@@ -1,14 +1,13 @@
-﻿
+﻿using ServicesAbstractions.Interfaces;
 using Shared.DTOs;
 using System.Net;
-using System.Text;
 
-namespace Services
+namespace Services.Repositories
 {
     internal class AuthenticationService(UserManager<ApplicationUser> userManager, IOptions<JWTOptions> jwtOptions) : IAuthenticationService
     {
         public async Task<bool> CheckEmailAsync(string email)
-        => (await userManager.FindByEmailAsync(email)) != null;
+        => await userManager.FindByEmailAsync(email) != null;
         
         public async Task<APIResponse<UserResponse>> LoginAsync(LoginRequest loginRequest)
         {

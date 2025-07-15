@@ -1,9 +1,6 @@
-﻿using Services.Specifications;
-using Shared.DTOs;
-using Shared.QueryParameters;
-using System.Net;
+﻿
 
-namespace Services
+namespace Services.Repositories
 {
     internal class SubjectService(IUnitOfWork unitOfWork, IMapper mapper) : ISubjectService
     {

@@ -1,4 +1,4 @@
-﻿using Shared.Options;
+﻿using Shared.Options.SortingOptions;
 
 namespace Shared.QueryParameters
 {
@@ -6,7 +6,7 @@ namespace Shared.QueryParameters
     {
         private const int DEFAULT_PAGE_SIZE = 5;
         private const int MAX_PAGE_SIZE = 10;
-        public SortingOptions sorting { get; set; }
+        public BaseSortingOptions sorting { get; set; }
         public string? search { get; set; }
         public int PageIndex { get; set; } = 1;
         private int _pageSize = DEFAULT_PAGE_SIZE;

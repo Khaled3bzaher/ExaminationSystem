@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Domain.Contracts;
 using Domain.Models.BaseEntities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Persistence.Data;
 
