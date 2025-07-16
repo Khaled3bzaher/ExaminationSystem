@@ -1,8 +1,3 @@
-
-using Domain.Contracts;
-using ExaminationSystem.Web.Factories;
-using ExaminationSystem.Web.Middlewares;
-using Microsoft.AspNetCore.Mvc;
 using Persistence;
 using Services;
 
@@ -33,6 +28,8 @@ namespace ExaminationSystem.Web
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
+                app.UseSwagger();
+                app.UseSwaggerUI();
                 app.MapOpenApi();
             }
 

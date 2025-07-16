@@ -16,8 +16,11 @@ namespace Services.Repositories
                 return APIResponse<UserResponse>.FailureResponse($"User with Email: {loginRequest.Email} Not Found..!", (int)HttpStatusCode.NotFound);
 
             var loginValid = await userManager.CheckPasswordAsync(userFound, loginRequest.Password);
-            if (loginValid && userFound.IsActive) // For User Set Active
-                return APIResponse<UserResponse>.SuccessResponse(new UserResponse(loginRequest.Email, userFound.FullName, await CreateTokenAsync(userFound)));
+            if (loginValid)
+                if(!userFound.IsActive) // For User Set Active
+                    return APIResponse<UserResponse>.FailureResponse($"User {userFound.FullName} is Disabled", (int)HttpStatusCode.Unauthorized);
+                else
+                    return APIResponse<UserResponse>.SuccessResponse(new UserResponse(loginRequest.Email, userFound.FullName, await CreateTokenAsync(userFound)));
 
             return APIResponse<UserResponse>.FailureResponse("Invalid Email Or Password", (int)HttpStatusCode.Unauthorized);
         }

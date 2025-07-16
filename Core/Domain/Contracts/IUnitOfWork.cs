@@ -11,5 +11,7 @@ namespace Domain.Contracts
         Task<int> SaveChangesAsync();
 
         IGenericRepository<TEntity, TKey> GetRepository<TEntity, TKey>() where TEntity : BaseEntityPrimaryKey<TKey>;
+
+        IStudentRepository StudentRepository { get; }
     }
 }

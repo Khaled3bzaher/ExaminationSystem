@@ -1,6 +1,8 @@
 ﻿
 
+using Microsoft.AspNetCore.Authorization;
 using ServicesAbstractions.Interfaces;
+using Shared.Authentication;
 
 namespace Persentation.Controllers
 {
@@ -9,6 +11,7 @@ namespace Persentation.Controllers
     public class SubjectsController(IServiceManager serviceManager) : ControllerBase
     {
         [HttpGet]
+        //[Authorize(Policy =AppPolicy.ADMIN_POLICY)]
         public async Task<ActionResult<PaginatedResponse<SubjectResponse>>> GetAllSubjects([FromQuery] SubjectQueryParameters parameters)
         {
             var subjects = await serviceManager.SubjectService.GetAllSubjectsAsync(parameters);

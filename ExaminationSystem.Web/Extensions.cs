@@ -22,6 +22,10 @@ namespace ExaminationSystem.Web
                 options.InvalidModelStateResponseFactory = APIResponseFactory.GenerateAPIValidationResponse;
             });
             ConfigureJWT(services, configuration);
+
+            services.AddEndpointsApiExplorer();
+            services.AddSwaggerGen();
+
             return services;
         }
         public static async Task<WebApplication> InitializeDatabaseAsync(this WebApplication app)

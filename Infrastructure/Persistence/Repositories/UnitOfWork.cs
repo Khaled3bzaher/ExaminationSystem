@@ -26,5 +26,7 @@ namespace Persistence.Repositories
         public async Task RollbackTransactionAsync() => await context.Database.RollbackTransactionAsync();
 
         public void Dispose() => context.Dispose();
+
+        public IStudentRepository StudentRepository => new StudentRepository(context,mapper);
     }
 }
