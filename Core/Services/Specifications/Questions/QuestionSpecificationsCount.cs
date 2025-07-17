@@ -2,8 +2,15 @@
 
 namespace Services.Specifications.Questions
 {
-    internal class QuestionSpecificationsCount(QuestionQueryParameters parameters) : BaseSpecifications<Question>(CreateCriteria(parameters))
+    internal class QuestionSpecificationsCount : BaseSpecifications<Question>
     {
+        public QuestionSpecificationsCount(QuestionQueryParameters parameters) : base(CreateCriteria(parameters))
+        {
+        }
+        public QuestionSpecificationsCount(Guid subjectId) : base(s => s.SubjectId == subjectId)
+        {
+
+        }
         private static Expression<Func<Question, bool>> CreateCriteria(QuestionQueryParameters parameters)
         {
             return p =>

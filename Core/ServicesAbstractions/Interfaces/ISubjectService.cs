@@ -11,5 +11,6 @@ namespace ServicesAbstractions.Interfaces
         Task<APIResponse<string>> CreateSubjectAsync(SubjectDTO subject);
         Task<APIResponse<string>> UpdateSubjectAsync(Guid subjectId,SubjectDTO subject);
         Task<APIResponse<string>> DeleteSubjectAsync(Guid subjectId);
+        Task<APIResponse<string>> UpdateSubjectConfigurationAsync(Guid subjectId, SubjectConfigurationDTO configurationDTO);
     }
 }

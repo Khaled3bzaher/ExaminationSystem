@@ -1,4 +1,6 @@
 ﻿
+using Persistence.Repositories;
+
 namespace Services.Repositories
 {
     public class ServiceManager(IUnitOfWork unitOfWork,IMapper mapper,UserManager<ApplicationUser> userManager,IOptions<JWTOptions> jwtOptions) : IServiceManager
@@ -8,10 +10,13 @@ namespace Services.Repositories
         private readonly Lazy<IQuestionsService> _lazyQuestionsService = new Lazy<IQuestionsService>(() => new QuestionsService(unitOfWork,mapper));
         private readonly Lazy<IStudentService> _lasyStudentService = new Lazy<IStudentService>(() => new StudentService(userManager,unitOfWork));
 
+        private readonly Lazy<IExamService> _lasyExamService = new Lazy<IExamService>(() => new ExamService(unitOfWork));
+
         public ISubjectService SubjectService => _subjectService.Value;
         public IAuthenticationService AuthenticationService => _lazyAuthenticationService.Value;
 
         public IStudentService StudentService => _lasyStudentService.Value;
+        public IExamService ExamService=> _lasyExamService.Value;
 
         public IQuestionsService QuestionsService => _lazyQuestionsService.Value;
     }

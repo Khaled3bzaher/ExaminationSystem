@@ -1,9 +1,9 @@
 ﻿namespace Domain.Enums
 {
-    public enum ResultsStatus
+    public enum ExamStatus
     {
         Success,
         Failed,
-        Pending
+        NotCompleted
     }
 }

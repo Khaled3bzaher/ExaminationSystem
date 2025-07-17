@@ -1,4 +1,5 @@
-﻿using Domain.Models.BaseEntities;
+﻿using Domain.Enums;
+using Domain.Models.BaseEntities;
 
 namespace Domain.Models
 {
@@ -9,6 +10,7 @@ namespace Domain.Models
         public ApplicationUser Student { get; set; }
         public string StudentId { get; set; }
         public DateTime? SubmittedAt { get; set; }
+        public ExamStatus ExamStatus { get; set; } = ExamStatus.NotCompleted;
         public ICollection<ExamQuestion> ExamQuestions { get; set; } = [];
         public ExamResult? ExamResult { get; set; }
     }

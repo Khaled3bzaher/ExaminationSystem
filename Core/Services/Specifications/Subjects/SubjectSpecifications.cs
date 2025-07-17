@@ -1,9 +1,8 @@
-﻿
-using Shared.Options.SortingOptions;
+﻿using Shared.Options.SortingOptions;
 using Shared.QueryParameters;
 using System.Linq.Expressions;
 
-namespace Services.Specifications
+namespace Services.Specifications.Subjects
 {
     internal class SubjectSpecifications : BaseSpecifications<Subject>
     {
@@ -18,7 +17,7 @@ namespace Services.Specifications
 
         private static Expression<Func<Subject,bool>> CreateCriteria(SubjectQueryParameters parameters)
         {
-            return p => (string.IsNullOrWhiteSpace(parameters.search) || p.Name.ToLower().Contains(parameters.search.Trim().ToLower()));
+            return p => string.IsNullOrWhiteSpace(parameters.search) || p.Name.ToLower().Contains(parameters.search.Trim().ToLower());
         }
 
         private void ApplySorting(BaseSortingOptions sorting)

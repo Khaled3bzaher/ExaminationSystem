@@ -6,6 +6,8 @@
         {
             CreateMap<Subject, SubjectResponse>();
             CreateMap<SubjectDTO, Subject>();
+            CreateMap<SubjectConfigurationDTO, ExamConfiguration>();
+            CreateMap<ExamConfiguration, SubjectConfigurationResponse>();
         }
     }
 }

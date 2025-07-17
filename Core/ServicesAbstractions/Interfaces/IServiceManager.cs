@@ -6,5 +6,6 @@
         IAuthenticationService AuthenticationService { get; }
         IQuestionsService QuestionsService { get; }
         IStudentService StudentService { get; }
+        IExamService ExamService { get; }
     }
 }

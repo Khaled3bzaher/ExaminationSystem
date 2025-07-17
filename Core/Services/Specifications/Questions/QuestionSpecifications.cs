@@ -1,4 +1,5 @@
-﻿using Shared.Options.SortingOptions;
+﻿using Domain.Enums;
+using Shared.Options.SortingOptions;
 using System.Linq.Expressions;
 
 namespace Services.Specifications.Questions
@@ -9,6 +10,18 @@ namespace Services.Specifications.Questions
         {
             ApplySorting(parameters.sorting);
             ApplyPagination(parameters.PageSize, parameters.PageIndex);
+        }
+        public QuestionSpecifications(Guid subjectId,DifficultyLevel level,int questionCount) : base(s=>s.SubjectId==subjectId && s.QuestionLevel==level)
+        {
+            AddOrderBy(q => Guid.NewGuid());
+            AddInclude(q=>q.Choices);
+            ApplyTaking(questionCount);
+        }
+        public QuestionSpecifications(Guid subjectId, int questionCount, List<Guid> currentQuestionsIds) : base(s => s.SubjectId == subjectId && !currentQuestionsIds.Contains(s.Id))
+        {
+            AddOrderBy(q => Guid.NewGuid());
+            AddInclude(q => q.Choices);
+            ApplyTaking(questionCount);
         }
 
         private static Expression<Func<Question, bool>> CreateCriteria(QuestionQueryParameters parameters)

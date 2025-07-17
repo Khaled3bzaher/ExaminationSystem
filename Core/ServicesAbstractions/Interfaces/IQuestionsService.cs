@@ -1,6 +1,5 @@
 ﻿using Shared.DTOs;
 using Shared.DTOs.Questions;
-using Shared.DTOs.Subjects;
 using Shared.QueryParameters;
 
 namespace ServicesAbstractions.Interfaces

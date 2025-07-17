@@ -26,7 +26,10 @@ namespace Services.Specifications
             Take = pageSize;
             Skip = (pageIndex - 1)*pageSize;
         }
-
+        protected void ApplyTaking(int count)
+        {
+            Take = count;
+        }
         protected void AddInclude(Expression<Func<T, object>> include) => IncludeExpressions.Add(include);
 
         protected void AddOrderBy(Expression<Func<T, object>> orderBy) => OrderBy=orderBy;

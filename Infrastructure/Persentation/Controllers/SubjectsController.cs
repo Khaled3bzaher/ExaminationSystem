@@ -41,5 +41,11 @@ namespace Persentation.Controllers
             var response = await serviceManager.SubjectService.DeleteSubjectAsync(Id);
             return response.ToActionResult();
         }
+        [HttpPut("Configurations")]
+        public async Task<IActionResult> UpdateSubjectConfigurations(Guid Id, [FromBody] SubjectConfigurationDTO configurationDTO)
+        {
+            var response = await serviceManager.SubjectService.UpdateSubjectConfigurationAsync(Id, configurationDTO);
+            return response.ToActionResult();
+        }
     }
 }
