@@ -1,5 +1,6 @@
 ﻿using Domain.Enums;
 using Domain.Models;
+using Microsoft.Extensions.Configuration;
 using Services.Specifications.Exams;
 using Services.Specifications.Questions;
 using Shared.DTOs;
@@ -7,7 +8,7 @@ using Shared.DTOs.Exams;
 
 namespace Persistence.Repositories
 {
-    public class ExamService(IUnitOfWork unitOfWork) : IExamService
+    public class ExamService(IUnitOfWork unitOfWork,IMapper mapper) : IExamService
     {
         public async Task<APIResponse<StudentExamResponse>> RequestExam(string studentId, Guid subjectId)
         {
@@ -41,19 +42,23 @@ namespace Persistence.Repositories
                         allQuestions = allQuestions.Concat(reminingQuestions).OrderBy(x => Guid.NewGuid()).ToList();
                 }
 
-                var generatedExam = new StudentExamResponse()
-                {
-                    DurationInMinutes = configurations.DurationInMinutes,
-                    Questions = allQuestions,
-                };
                 var studentExam = new StudentExam()
                 {
                     StudentId = studentId,
                     SubjectId = subjectId,
                 };
+                
                 await unitOfWork.GetRepository<StudentExam, Guid>().AddAsync(studentExam);
                 if (await unitOfWork.SaveChangesAsync() > 0)
+                {
+                    var generatedExam = new StudentExamResponse()
+                    {
+                        ExamId = studentExam.Id,
+                        DurationInMinutes = configurations.DurationInMinutes,
+                        Questions = allQuestions,
+                    };
                     return APIResponse<StudentExamResponse>.SuccessResponse(generatedExam);
+                }
                 else
                     return APIResponse<StudentExamResponse>.FailureResponse("Something went wrong While Request Exam..!");
 
@@ -121,6 +126,24 @@ namespace Persistence.Repositories
         {
             var studentExamSpecifications = new StudentsExamsSpecifications(studentId, subjectId);
             return await unitOfWork.GetRepository<StudentExam, Guid>().GetAsync(studentExamSpecifications);
+        }
+
+        public async Task<APIResponse<string>> SubmitExam(StudentExamDTO examDTO)
+        {
+
+            var exam = await unitOfWork.GetRepository<StudentExam, Guid>().GetAsync(examDTO.ExamId);
+            if(exam == null)
+                return APIResponse<string>.FailureResponse("Cannot Submit this exam, Contact Administrator..!");
+            exam.SubmittedAt = examDTO.SubmittedAt;
+            exam.ExamQuestions = mapper.Map<ICollection<ExamQuestion>>(examDTO.Questions);
+            exam.ExamStatus = ExamStatus.Completed;
+            unitOfWork.GetRepository<StudentExam, Guid>().Update(exam);
+            if (await unitOfWork.SaveChangesAsync() > 0)
+            {
+                return APIResponse<string>.SuccessResponse($"Exam Submitted Successfully");
+            }
+            else
+                return APIResponse<string>.FailureResponse("Something went wrong While Submitting Exam..!");
         }
     }
 }

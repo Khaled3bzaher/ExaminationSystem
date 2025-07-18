@@ -4,6 +4,7 @@
     {
         Success,
         Failed,
-        NotCompleted
+        NotCompleted,
+        Completed
     }
 }

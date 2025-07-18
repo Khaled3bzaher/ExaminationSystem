@@ -6,6 +6,7 @@
         public string ProfilePictureUrl { get; set; }
         public string StudentName { get; set; }
         public string SubjectName { get; set; }
+        public DateTime ExamDateTime { get; set; }
         public string ExamStatus { get; set; }
     }
 }

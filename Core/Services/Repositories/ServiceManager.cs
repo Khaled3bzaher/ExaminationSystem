@@ -10,7 +10,7 @@ namespace Services.Repositories
         private readonly Lazy<IQuestionsService> _lazyQuestionsService = new Lazy<IQuestionsService>(() => new QuestionsService(unitOfWork,mapper));
         private readonly Lazy<IStudentService> _lasyStudentService = new Lazy<IStudentService>(() => new StudentService(userManager,unitOfWork));
 
-        private readonly Lazy<IExamService> _lasyExamService = new Lazy<IExamService>(() => new ExamService(unitOfWork));
+        private readonly Lazy<IExamService> _lasyExamService = new Lazy<IExamService>(() => new ExamService(unitOfWork,mapper));
 
         private readonly Lazy<IAdminService> _lasyAdminService = new Lazy<IAdminService>(() => new AdminService(unitOfWork));
 

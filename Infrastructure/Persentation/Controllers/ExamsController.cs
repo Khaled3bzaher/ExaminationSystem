@@ -1,4 +1,5 @@
 ﻿using ServicesAbstractions.Interfaces;
+using Shared.DTOs.Exams;
 
 namespace Persentation.Controllers
 {
@@ -19,5 +20,11 @@ namespace Persentation.Controllers
             return response.ToActionResult();
         }
 
+        [HttpPost("SubmitExam")]
+        public async Task<IActionResult> SubmitExam(StudentExamDTO examDTO)
+        {
+            var response = await serviceManager.ExamService.SubmitExam(examDTO);
+            return response.ToActionResult();
+        }
     }
 }
