@@ -21,5 +21,8 @@ namespace Persistence.Repositories
 
         public async Task<bool> isStudentExistsAsync(string studentId)
             => await context.Set<ApplicationUser>().AnyAsync(s => s.Id == studentId);
+
+        public async Task<int> CountAsync()
+         => await context.Set<ApplicationUser>().CountAsync();
     }
 }

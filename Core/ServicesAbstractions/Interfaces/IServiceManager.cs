@@ -7,5 +7,6 @@
         IQuestionsService QuestionsService { get; }
         IStudentService StudentService { get; }
         IExamService ExamService { get; }
+        IAdminService AdminService { get; }
     }
 }

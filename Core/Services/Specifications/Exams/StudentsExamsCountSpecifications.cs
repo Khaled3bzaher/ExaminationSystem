@@ -1,9 +1,17 @@
-﻿using System.Linq.Expressions;
+﻿using Domain.Enums;
+using System.Linq.Expressions;
 
 namespace Services.Specifications.Exams
 {
-    internal class StudentsExamsCountSpecifications(ExamHistoryParameters parameters) : BaseSpecifications<StudentExam>(CreateCriteria(parameters))
+    internal class StudentsExamsCountSpecifications : BaseSpecifications<StudentExam>
     {
+        public StudentsExamsCountSpecifications(ExamHistoryParameters parameters) : base(CreateCriteria(parameters))
+        {
+        }
+        public StudentsExamsCountSpecifications(ExamStatus examStatus) : base(e=>e.ExamStatus==examStatus)
+        {
+        }
+
         private static Expression<Func<StudentExam, bool>> CreateCriteria(ExamHistoryParameters parameters)
         {
             return p =>

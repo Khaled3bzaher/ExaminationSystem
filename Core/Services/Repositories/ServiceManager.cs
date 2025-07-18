@@ -12,12 +12,14 @@ namespace Services.Repositories
 
         private readonly Lazy<IExamService> _lasyExamService = new Lazy<IExamService>(() => new ExamService(unitOfWork));
 
+        private readonly Lazy<IAdminService> _lasyAdminService = new Lazy<IAdminService>(() => new AdminService(unitOfWork));
+
         public ISubjectService SubjectService => _subjectService.Value;
         public IAuthenticationService AuthenticationService => _lazyAuthenticationService.Value;
 
         public IStudentService StudentService => _lasyStudentService.Value;
         public IExamService ExamService=> _lasyExamService.Value;
-
+        public IAdminService AdminService => _lasyAdminService.Value;
         public IQuestionsService QuestionsService => _lazyQuestionsService.Value;
     }
 }
