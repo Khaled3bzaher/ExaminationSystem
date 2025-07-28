@@ -34,7 +34,7 @@ namespace ExaminationSystem.Web
             }
 
             app.UseHttpsRedirection();
-
+            app.UseCors("AllowAngular");
             app.UseAuthentication();
             app.UseAuthorization();
 

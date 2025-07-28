@@ -26,6 +26,19 @@ namespace ExaminationSystem.Web
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
+            services.AddCors(
+                options => {
+                    options.AddPolicy("AllowAngular",
+                        policy => policy
+                            .WithOrigins("http://localhost:4200")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials()
+                        );
+                }
+                );
+
+
             return services;
         }
         public static async Task<WebApplication> InitializeDatabaseAsync(this WebApplication app)
@@ -66,6 +79,14 @@ namespace ExaminationSystem.Web
                 policy.RequireAssertion(context =>
                         context.User.HasClaim(c => c.Type == ClaimTypes.Role &&
                         (c.Value == AppRoles.ADMIN || c.Value == AppRoles.STUDENT)));
+                });
+                config.AddPolicy(AppPolicy.ADMIN_POLICY, policy =>
+                {
+                    policy.RequireClaim(ClaimTypes.Role, AppRoles.ADMIN);
+                });
+                config.AddPolicy(AppPolicy.STUDENT_POLICY, policy =>
+                {
+                    policy.RequireClaim(ClaimTypes.Role, AppRoles.STUDENT);
                 });
             });
         }

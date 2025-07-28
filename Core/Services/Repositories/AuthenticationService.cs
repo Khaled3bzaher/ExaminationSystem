@@ -1,4 +1,5 @@
-﻿using ServicesAbstractions.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using ServicesAbstractions.Interfaces;
 using Shared.DTOs;
 using System.Net;
 
@@ -27,6 +28,10 @@ namespace Services.Repositories
 
         public async Task<APIResponse<UserResponse>> RegisterAsync(RegisterRequest registerRequest)
         {
+            if (await userManager.Users.AnyAsync(u=>u.PhoneNumber == registerRequest.PhoneNumber))
+            {
+                return APIResponse<UserResponse>.FailureResponse("Phone Number already exists", (int)HttpStatusCode.Conflict);
+            }
             var user = new ApplicationUser
             {
                 Email = registerRequest.Email,
@@ -35,19 +40,23 @@ namespace Services.Repositories
                 UserName = registerRequest.Email
             };
             var result = await userManager.CreateAsync(user,registerRequest.Password);
+            if (!result.Succeeded) {
+                var errors = result.Errors.Select(e => e.Description).ToList();
+                return APIResponse<UserResponse>.FailureResponse(errors.FirstOrDefault(), (int)HttpStatusCode.Conflict);
+            }
             var roleResult = await userManager.AddToRoleAsync(user, AppRoles.STUDENT);
-            if (result.Succeeded && roleResult.Succeeded)
+            if (roleResult.Succeeded)
                 return APIResponse<UserResponse>.SuccessResponse(new UserResponse(registerRequest.Email, registerRequest.Name, await CreateTokenAsync(user)));
            
-            var errors = result.Errors.Select(e => e.Description).ToList();
 
-            return APIResponse<UserResponse>.FailureResponse(errors.FirstOrDefault(),(int)HttpStatusCode.Conflict);
+            return APIResponse<UserResponse>.FailureResponse("Internal Server Error");
         }
         private async Task<string> CreateTokenAsync(ApplicationUser user)
         {
             var jwt = jwtOptions.Value;
             var claims = new List<Claim>()
             {
+                new(ClaimTypes.NameIdentifier,user.Id),
                 new(ClaimTypes.Email,user.Email!),
                 new(ClaimTypes.Name,user.FullName!),
             };

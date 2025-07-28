@@ -1,10 +1,14 @@
-﻿using ServicesAbstractions.Interfaces;
+﻿using Microsoft.AspNetCore.Authorization;
+using ServicesAbstractions.Interfaces;
+using Shared.Authentication;
 using Shared.DTOs.Exams;
+using System.Security.Claims;
 
 namespace Persentation.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ExamsController(IServiceManager serviceManager) : ControllerBase
     {
         [HttpGet("RequestExam")]
@@ -16,6 +20,13 @@ namespace Persentation.Controllers
         [HttpGet("ExamsHistory")]
         public async Task<IActionResult> ExamsHistory([FromQuery]ExamHistoryParameters parameters)
         {
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (role == AppRoles.STUDENT)
+            {
+                parameters.studentId = userId;
+            }
             var response = await serviceManager.ExamService.GetAllExamsHistory(parameters);
             return response.ToActionResult();
         }

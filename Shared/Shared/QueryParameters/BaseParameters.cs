@@ -10,7 +10,7 @@
         public int PageSize
         {
             get => _pageSize;
-            set => _pageSize = value > 0 && value < MAX_PAGE_SIZE ? value : DEFAULT_PAGE_SIZE;
+            set => _pageSize = value > 0 && value <= MAX_PAGE_SIZE ? value : DEFAULT_PAGE_SIZE;
         }
     }
 }

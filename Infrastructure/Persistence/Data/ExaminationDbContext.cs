@@ -35,6 +35,7 @@ namespace Persistence.Data
             modelBuilder.Entity<QuestionChoice>().HasQueryFilter(s => s.Question.DeletedAt == null);
             modelBuilder.Entity<ExamConfiguration>().HasQueryFilter(s => s.Subject.DeletedAt == null);
             modelBuilder.Entity<StudentExam>().HasQueryFilter(s => s.DeletedAt == null);
+            modelBuilder.Entity<StudentExam>().HasQueryFilter(s => s.Subject.DeletedAt == null);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AssemblyReference).Assembly);
         }
     }

@@ -23,9 +23,12 @@ namespace Services.Repositories
         public async Task<PaginatedResponse<StudentResponse>> GetAllStudentsAsync(StudentQueryParamters parameters)
         {
             var specifications = new StudentSpecifications(parameters);
+            var totalCount = await unitOfWork.StudentRepository.CountAsync(new StudentSpecificationsCount(parameters));
+            if(totalCount==0)
+                return new(parameters.PageIndex, 0, 0, null);
+
             var students = await unitOfWork.StudentRepository.GetAllProjectedAsync<StudentResponse>(specifications);
             var studentsCount = students.Count();
-            var totalCount = await unitOfWork.StudentRepository.CountAsync(new StudentSpecificationsCount(parameters));
             return new(parameters.PageIndex, studentsCount, totalCount, students);
         }
     }

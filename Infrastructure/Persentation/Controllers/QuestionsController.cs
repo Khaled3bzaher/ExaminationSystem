@@ -1,11 +1,14 @@
 ﻿
+using Microsoft.AspNetCore.Authorization;
 using ServicesAbstractions.Interfaces;
+using Shared.Authentication;
 using Shared.DTOs.Questions;
 
 namespace Persentation.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = AppPolicy.ADMIN_POLICY)]
     public class QuestionsController(IServiceManager serviceManager) : ControllerBase
     {
         [HttpGet]

@@ -6,7 +6,6 @@ namespace Shared.DTOs.Exams
     {
         [Required]
         public Guid QuestionId { get; set; }
-        [Required]
-        public int SelectedChoiceId { get; set; }
+        public int? SelectedChoiceId { get; set; }
     }
 }
