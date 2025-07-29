@@ -1,7 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ServicesAbstractions.Interfaces;
-using Shared.DTOs;
-using System.Net;
 
 namespace Services.Repositories
 {
@@ -70,7 +67,7 @@ namespace Services.Repositories
                 issuer: jwt.Issuer,
                 audience: jwt.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(jwt.DurationInHours),
+                expires: DateTime.Now.AddHours(jwt.DurationInHours),
                 signingCredentials:creds
                 );
 

@@ -13,13 +13,13 @@ namespace Persistence.Repositories
         public async Task AddAsync(TEntity entity) => await context.Set<TEntity>().AddAsync(entity);
         public void Delete(TEntity entity) {
             if (entity is BaseEntity<TKey> baseEntity)
-                baseEntity.DeletedAt = DateTime.UtcNow;
+                baseEntity.DeletedAt = DateTime.Now;
             else
                 context.Set<TEntity>().Remove(entity);
         }
         public void Update(TEntity entity) {
             if (entity is BaseEntity<TKey> baseEntity)
-                baseEntity.ModifiedAt = DateTime.UtcNow;
+                baseEntity.ModifiedAt = DateTime.Now;
             context.Set<TEntity>().Update(entity); 
         }
         public async Task<IEnumerable<TEntity>> GetAllAsync(bool trackChanges = false)

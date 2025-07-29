@@ -1,4 +1,4 @@
-﻿namespace Domain.Models.BaseEntities
+﻿namespace EvaluationService.Domain.Models.BaseEntities
 {
     public abstract class BaseEntity<TKey> : BaseEntityPrimaryKey<TKey>
     {

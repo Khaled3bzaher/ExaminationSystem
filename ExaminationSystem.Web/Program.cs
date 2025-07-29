@@ -1,3 +1,5 @@
+using ExaminationSystem.Web.Hubs;
+using Persentation.Messaging;
 using Persistence;
 using Services;
 
@@ -16,6 +18,9 @@ namespace ExaminationSystem.Web
             builder.Services.AddInfrastructureServices(builder.Configuration);
             builder.Services.AddApplicationServices(builder.Configuration);
             builder.Services.AddWebApplicationServices(builder.Configuration);
+            builder.Services.AddHostedService<ExamScoreResultConsumer>();
+            builder.Logging.AddConsole();
+
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
@@ -23,6 +28,7 @@ namespace ExaminationSystem.Web
 
             var app = builder.Build();
             await app.InitializeDatabaseAsync();
+            app.MapHub<ExamHub>("/examHub");
 
 
             // Configure the HTTP request pipeline.

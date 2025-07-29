@@ -19,6 +19,12 @@ namespace Services.MappingProfiles
             CreateMap<StudentExamDTO, StudentExam>()
                 .ForMember(s => s.ExamQuestions, opt => opt.MapFrom(src => src.Questions))
                 ;
+            CreateMap<StudentExam, StartExamNotificationDTO>()
+                .ForMember(s => s.SubjectName, opt => opt.MapFrom(src => src.Subject.Name))
+                .ForMember(s => s.StudentName, opt => opt.MapFrom(src => src.Student.FullName));
+
+
+
         }
     }
 }

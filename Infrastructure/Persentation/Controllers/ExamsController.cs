@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using ExaminationSystem.Web.Hubs;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
 using ServicesAbstractions.Interfaces;
 using Shared.Authentication;
 using Shared.DTOs.Exams;
@@ -9,12 +11,20 @@ namespace Persentation.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class ExamsController(IServiceManager serviceManager) : ControllerBase
+    public class ExamsController(IServiceManager serviceManager, IHubContext<ExamHub> hubContext) : ControllerBase
     {
         [HttpGet("RequestExam")]
         public async Task<IActionResult> RequestExam(string studentId, Guid subjectId)
         {
             var response = await serviceManager.ExamService.RequestExam(studentId, subjectId);
+            if (response.Success)
+            {
+                await hubContext.Clients.Group("Admins").SendAsync("StudentStartedExam", new StartExamNotificationDTO
+                {
+                    StudentName=response.Data!.StudentName,
+                    SubjectName=response.Data!.SubjectName
+                });
+            }
             return response.ToActionResult();
         }
         [HttpGet("ExamsHistory")]

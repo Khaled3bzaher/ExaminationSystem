@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Data;
 using Persistence.Repositories;
+using ServicesAbstractions.Messaging;
 
 namespace Persistence
 {
@@ -20,6 +21,7 @@ namespace Persistence
             });
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddSingleton<IMessagingService, RabbitMQService>();
 
             ConfigureIdentity(services,configuration);
             return services;

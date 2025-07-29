@@ -1,14 +1,12 @@
 ﻿using Domain.Enums;
-using Domain.Models;
-using Microsoft.Extensions.Configuration;
 using Services.Specifications.Exams;
 using Services.Specifications.Questions;
-using Shared.DTOs;
+using ServicesAbstractions.Messaging;
 using Shared.DTOs.Exams;
 
 namespace Persistence.Repositories
 {
-    public class ExamService(IUnitOfWork unitOfWork,IMapper mapper) : IExamService
+    public class ExamService(IUnitOfWork unitOfWork,IMapper mapper, IMessagingService rabbitMQ) : IExamService
     {
         public async Task<APIResponse<StudentExamResponse>> RequestExam(string studentId, Guid subjectId)
         {
@@ -51,12 +49,17 @@ namespace Persistence.Repositories
                 await unitOfWork.GetRepository<StudentExam, Guid>().AddAsync(studentExam);
                 if (await unitOfWork.SaveChangesAsync() > 0)
                 {
+                    var notification = await unitOfWork.GetRepository<StudentExam, Guid>().GetProjectedAsync<StartExamNotificationDTO>(new StudentsExamsSpecifications(studentId, subjectId));
+
                     var generatedExam = new StudentExamResponse()
                     {
                         ExamId = studentExam.Id,
+                        StudentName = notification.StudentName,
+                        SubjectName = notification.SubjectName,
                         DurationInMinutes = configurations.DurationInMinutes,
                         Questions = allQuestions,
                     };
+
                     return APIResponse<StudentExamResponse>.SuccessResponse(generatedExam);
                 }
                 else
@@ -140,6 +143,8 @@ namespace Persistence.Repositories
             unitOfWork.GetRepository<StudentExam, Guid>().Update(exam);
             if (await unitOfWork.SaveChangesAsync() > 0)
             {
+                await rabbitMQ.PublishAsync(QueuesConstants.EXAMS_SUBMIT_QUEUE, examDTO);
+                Console.WriteLine($"Message Published to Queue:" + examDTO.ExamId);
                 return APIResponse<string>.SuccessResponse($"Exam Submitted Successfully");
             }
             else
