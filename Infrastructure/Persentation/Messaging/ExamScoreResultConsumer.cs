@@ -1,13 +1,17 @@
-﻿using ExaminationSystem.Web.Hubs;
+﻿using Domain.Models;
+using Domain.Services;
+using ExaminationSystem.Web.Hubs;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ServicesAbstractions.Messaging;
 using Shared.DTOs.Exams;
+using Shared.DTOs.Notifications;
 
 namespace Persentation.Messaging
 {
-    public class ExamScoreResultConsumer(IMessagingService rabbitMQ,ILogger<ExamScoreResultConsumer> logger, IHubContext<ExamHub> hubContext) : BackgroundService
+    public class ExamScoreResultConsumer(IMessagingService rabbitMQ,ILogger<ExamScoreResultConsumer> logger, IServiceProvider serviceProvider, IHubContext<ExamHub> hubContext) : BackgroundService
     {
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -20,6 +24,18 @@ namespace Persentation.Messaging
                     await hubContext.Clients.User(result.StudentId.ToString()).SendAsync("ReceiveExamScore", result);
 
                     await hubContext.Clients.Group("Admins").SendAsync("NewExamResultAvailable", result);
+
+                    using (var scope = serviceProvider.CreateScope())
+                    {
+                        var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
+                        await notificationService.CreateNotification(new NotificationDTO
+                        {
+                            Title = $"{result.StudentName}: New Exam Result",
+                            Message = $"You have a new exam result for {result.SubjectName}. Score: {result.Score}",
+                            StudentId = result.StudentId,
+                        });
+                    }
+                    
 
                     logger.LogInformation($"Successfully sent exam result to student {result.StudentId} and admins");
                 }

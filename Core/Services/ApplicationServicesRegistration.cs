@@ -1,5 +1,7 @@
 ﻿
 
+using Domain.Contracts;
+using Domain.Services;
 using Services.Repositories;
 using ServicesAbstractions.Interfaces;
 
@@ -15,6 +17,8 @@ namespace Services
         public static IServiceCollection AddApplicationServices(this IServiceCollection services,IConfiguration configuration)
         {
             services.AddScoped<IServiceManager, ServiceManager>();
+            services.AddScoped<INotificationService, NotificationService>();
+
             services.AddAutoMapper(typeof(AssemblyReference).Assembly);
             services.AddValidatorsFromAssembly(typeof(AssemblyReference).Assembly, includeInternalTypes: true);
             services.AddFluentValidationAutoValidation();

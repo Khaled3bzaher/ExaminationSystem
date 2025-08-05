@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using Domain.Contracts;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
 
 namespace Persistence.Repositories
 {
@@ -30,6 +31,24 @@ namespace Persistence.Repositories
         }
         public static IQueryable<TDto> CreateQuery<T, TDto>(IQueryable<T> inputQuery, ISpecifications<T> specifications, IConfigurationProvider configuration) where T : class
             => CreateQuery<T>(inputQuery, specifications).ProjectTo<TDto>(configuration);
-        
+
+        public static IFindFluent<T,TDto> GetMongoQuery<T, TDto>(IMongoCollection<T> collection,ISpecifications<T> spec, ProjectionDefinition<T, TDto> projection) where T : class
+        {
+            var query = collection.Find(spec.Criteria);
+            if (spec.OrderByDescending != null)
+            {
+                query = query.SortByDescending(spec.OrderByDescending);
+            }
+
+            if (spec.IsPaginated)
+            {
+                query = query.Skip(spec.Skip);
+                query = query.Limit(spec.Take);
+            }
+
+
+            return query.Project(projection);
+
+        }
     }
 }

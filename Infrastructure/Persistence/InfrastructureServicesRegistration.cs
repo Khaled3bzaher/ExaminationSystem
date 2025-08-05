@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Data;
+using Persistence.Mongo;
+using Persistence.Mongo.Settings;
 using Persistence.Repositories;
 using ServicesAbstractions.Messaging;
 
@@ -14,6 +16,11 @@ namespace Persistence
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services,IConfiguration configuration)
         {
+            services.Configure<MongoDBSettings>(configuration.GetSection("MongoDB"));
+            services.AddSingleton<MongoDBContext>();
+            services.AddScoped<INotificationRepository, NotificationRepository>();
+
+
             services.AddScoped<IDbInitializer, DbInitializer>();
             services.AddDbContext<ExaminationDbContext>(options =>
             {
