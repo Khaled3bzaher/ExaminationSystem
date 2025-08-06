@@ -7,7 +7,8 @@
             CreateMap<Subject, SubjectResponse>();
             CreateMap<SubjectDTO, Subject>();
             CreateMap<SubjectConfigurationDTO, ExamConfiguration>();
-            CreateMap<ExamConfiguration, SubjectConfigurationResponse>();
+            CreateMap<ExamConfiguration, SubjectConfigurationResponse>()
+                .ForMember(d=>d.SubjectName,opt=>opt.MapFrom(s=>s.Subject.Name));
         }
     }
 }

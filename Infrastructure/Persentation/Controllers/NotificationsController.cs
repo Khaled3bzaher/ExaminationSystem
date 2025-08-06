@@ -20,9 +20,14 @@ namespace Persentation.Controllers
             if (role == AppRoles.STUDENT)
             {
                 notificationParameters.studentId = userId;
+                notificationParameters.ForAdmin = false;
+            }
+            else if (role == AppRoles.ADMIN)
+            {
+                notificationParameters.ForAdmin = true;
             }
 
-            var response = await notificationService.GetAllNotifications(notificationParameters);
+                var response = await notificationService.GetAllNotifications(notificationParameters);
             return response.ToActionResult();
         }
         [HttpPut("{Id}")]

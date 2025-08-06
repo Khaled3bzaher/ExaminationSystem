@@ -58,6 +58,23 @@ namespace Services.Repositories
             return APIResponse<SubjectResponse>.SuccessResponse(subject);
         }
 
+        public async Task<APIResponse<PaginatedResponse<SubjectConfigurationResponse>>> GetSubjectsConfigurationAsync(SubjectConfigurationQueryParameters parameters)
+        {
+            var specificationsCount = new ExamConfigurationCountSpecifications(parameters);
+            var configurationsCount = await unitOfWork.GetRepository<ExamConfiguration, int>().CountAsync(specificationsCount);
+            if(configurationsCount == 0)
+                return APIResponse<PaginatedResponse<SubjectConfigurationResponse>>.FailureResponse($"No Subjects Found Yet", (int)HttpStatusCode.NotFound);
+
+            var specifications = new ExamConfigurationSpecifications(parameters);
+            var configurations = await unitOfWork.GetRepository<ExamConfiguration, int>().GetAllProjectedAsync<SubjectConfigurationResponse>(specifications);
+            
+            var pageCount = configurations.Count();
+            var paginatedData = new PaginatedResponse<SubjectConfigurationResponse>(parameters.PageIndex, pageCount,configurationsCount, configurations);
+
+            return APIResponse<PaginatedResponse<SubjectConfigurationResponse>>.SuccessResponse(paginatedData);
+
+        }
+
         public async Task<APIResponse<string>> UpdateSubjectAsync(Guid subjectId, SubjectDTO subject)
         {
             var subjectFound = await unitOfWork.GetRepository<Subject, Guid>().GetAsync(subjectId);

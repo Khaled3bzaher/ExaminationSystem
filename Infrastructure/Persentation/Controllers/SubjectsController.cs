@@ -18,7 +18,7 @@ namespace Persentation.Controllers
             return Ok(subjects);
         }
         [HttpGet("{id}")]
-        [Authorize(Policy =AppPolicy.ADMIN_POLICY)]
+        [Authorize(Policy = AppPolicy.ADMIN_POLICY)]
         public async Task<IActionResult> GetSubject(Guid id)
         {
             var response = await serviceManager.SubjectService.GetSubjectAsync(id);
@@ -49,10 +49,16 @@ namespace Persentation.Controllers
         }
         [HttpPut("Configurations")]
         [Authorize(Policy = AppPolicy.ADMIN_POLICY)]
-
         public async Task<IActionResult> UpdateSubjectConfigurations(Guid Id, [FromBody] SubjectConfigurationDTO configurationDTO)
         {
             var response = await serviceManager.SubjectService.UpdateSubjectConfigurationAsync(Id, configurationDTO);
+            return response.ToActionResult();
+        }
+        [HttpGet("Configurations")]
+        [Authorize(Policy = AppPolicy.ADMIN_POLICY)]
+        public async Task<IActionResult> GetSubjectsConfiguration([FromQuery] SubjectConfigurationQueryParameters parameters)
+        {
+            var response = await serviceManager.SubjectService.GetSubjectsConfigurationAsync(parameters);
             return response.ToActionResult();
         }
     }

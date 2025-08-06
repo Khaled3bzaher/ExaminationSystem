@@ -9,5 +9,6 @@ namespace ServicesAbstractions.Interfaces
         Task<APIResponse<StudentExamResponse>> RequestExam(string studentId, Guid subjectId);
         Task<APIResponse<PaginatedResponse<ExamHistoryResponse>>> GetAllExamsHistory(ExamHistoryParameters parameters);
         Task<APIResponse<string>> SubmitExam(StudentExamDTO examDTO);
+
     }
 }
