@@ -20,7 +20,8 @@ namespace Persentation.Extensions
                 StatusCodes.Status401Unauthorized => new UnauthorizedObjectResult(apiResponse),
                 StatusCodes.Status404NotFound => new NotFoundObjectResult(apiResponse),
                 StatusCodes.Status409Conflict => new ConflictObjectResult(apiResponse),
-                _ => new ObjectResult(apiResponse) { StatusCode = 500 }
+                StatusCodes.Status403Forbidden => new ObjectResult(apiResponse) { StatusCode = StatusCodes.Status403Forbidden },
+                _ => new ObjectResult(apiResponse) { StatusCode = StatusCodes.Status500InternalServerError }
             };
         }
     }

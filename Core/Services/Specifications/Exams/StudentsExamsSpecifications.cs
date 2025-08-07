@@ -8,6 +8,10 @@ namespace Services.Specifications.Exams
         public StudentsExamsSpecifications(string studentId,Guid subjectId) : base(s=>s.StudentId==studentId && s.SubjectId==subjectId)
         {
         }
+        public StudentsExamsSpecifications(Guid examId) : base(s => s.Id == examId)
+        {
+            
+        }
         public StudentsExamsSpecifications(ExamHistoryParameters parameters) : base(CreateCriteria(parameters))
         {
             AddInclude(p => p.Student);

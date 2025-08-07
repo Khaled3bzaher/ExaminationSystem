@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.SignalR;
 using ServicesAbstractions.Interfaces;
 using Shared.Authentication;
 using Shared.DTOs.Exams;
+using System.Runtime.InteropServices;
 using System.Security.Claims;
 
 namespace Persentation.Controllers
@@ -38,6 +39,19 @@ namespace Persentation.Controllers
                 parameters.studentId = userId;
             }
             var response = await serviceManager.ExamService.GetAllExamsHistory(parameters);
+            return response.ToActionResult();
+        }
+        [HttpGet("ExamPreview")]
+        public async Task<IActionResult> ExamsPreview(Guid examId)
+        {
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            string? studentId = null;
+            if (role == AppRoles.STUDENT)
+            {
+                studentId = userId;
+            }
+            var response = await serviceManager.ExamService.PreviewExam(examId, studentId);
             return response.ToActionResult();
         }
 

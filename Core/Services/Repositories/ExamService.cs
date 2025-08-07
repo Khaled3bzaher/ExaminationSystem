@@ -6,7 +6,7 @@ using Shared.DTOs.Exams;
 
 namespace Persistence.Repositories
 {
-    public class ExamService(IUnitOfWork unitOfWork,IMapper mapper, IMessagingService rabbitMQ) : IExamService
+    public class ExamService(IUnitOfWork unitOfWork, IMapper mapper, IMessagingService rabbitMQ) : IExamService
     {
         public async Task<APIResponse<StudentExamResponse>> RequestExam(string studentId, Guid subjectId)
         {
@@ -149,6 +149,23 @@ namespace Persistence.Repositories
             }
             else
                 return APIResponse<string>.FailureResponse("Something went wrong While Submitting Exam..!");
+        }
+
+        public async Task<APIResponse<PreviewExamResponse>> PreviewExam(Guid examId, string? studentId)
+        {
+            var studentExamSpecifications = new StudentsExamsSpecifications(examId);
+            var examRecord = await unitOfWork.GetRepository<StudentExam,Guid>().GetAsync(studentExamSpecifications);
+            if (examRecord == null)
+                return APIResponse<PreviewExamResponse>.FailureResponse("Exam Not Found..!", (int)HttpStatusCode.NotFound);
+            if(examRecord.ExamStatus == ExamStatus.NotCompleted)
+                return APIResponse<PreviewExamResponse>.FailureResponse("Exam Not Submitted Yet..!", (int)HttpStatusCode.Conflict);
+
+            if(!string.IsNullOrEmpty(studentId) && examRecord.StudentId!=studentId)
+                return APIResponse<PreviewExamResponse>.FailureResponse("You Are Not Allowed to Preview This Exam..!", (int)HttpStatusCode.Forbidden);
+
+            var previewExam = await unitOfWork.GetRepository<StudentExam, Guid>().GetProjectedAsync<PreviewExamResponse>(studentExamSpecifications);
+
+            return APIResponse<PreviewExamResponse>.SuccessResponse(previewExam);
         }
     }
 }

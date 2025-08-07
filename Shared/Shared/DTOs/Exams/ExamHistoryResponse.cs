@@ -8,5 +8,6 @@
         public string SubjectName { get; set; }
         public DateTime ExamDateTime { get; set; }
         public string ExamStatus { get; set; }
+        public double Result { get; set; }
     }
 }

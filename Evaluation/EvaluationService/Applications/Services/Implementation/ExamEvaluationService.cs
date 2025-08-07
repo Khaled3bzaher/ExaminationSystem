@@ -78,7 +78,7 @@ namespace EvaluationService.Applications.Services.Implementation
                         score++;
                     }
                 }
-                if (score >= (questionsCount / 2))
+                if (score > (questionsCount / 2))
                     studentExamRecord.ExamStatus = ExamStatus.Success;
                 else
                     studentExamRecord.ExamStatus = ExamStatus.Failed;
