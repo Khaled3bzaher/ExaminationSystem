@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Domain.Contracts
 {
-    public interface IUnitOfWork : IDisposable
+    public interface IUnitOfWork : IAsyncDisposable
     {
         Task<IDbContextTransaction> BeginTransactionAsync();
         Task CommitTransactionAsync();

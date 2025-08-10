@@ -9,15 +9,22 @@ namespace Services.Repositories
     {
         public async Task<APIResponse<string>> ChangeStudentStatus(string studentId)
         {
-            var student = await userManager.FindByIdAsync(studentId);
-            if (student == null)
-                return APIResponse<string>.FailureResponse($"Student with Id: {studentId} Not Found..!", (int)HttpStatusCode.NotFound);
-            student.IsActive = !student.IsActive;
-            var result = await userManager.UpdateAsync(student);
-            if (result.Succeeded)
-                return APIResponse<string>.SuccessResponse(null, $"{student.FullName} IsActive {student.IsActive} Now..!");
-            else
-                return APIResponse<string>.FailureResponse("Something went wrong While Saving..!");
+            try
+            {
+                var student = await userManager.FindByIdAsync(studentId);
+                if (student == null)
+                    return APIResponse<string>.FailureResponse($"Student with Id: {studentId} Not Found..!", (int)HttpStatusCode.NotFound);
+                student.IsActive = !student.IsActive;
+                var result = await userManager.UpdateAsync(student);
+                if (result.Succeeded)
+                    return APIResponse<string>.SuccessResponse(null, $"{student.FullName} IsActive {student.IsActive} Now..!");
+                else
+                    return APIResponse<string>.FailureResponse("Something went wrong While Saving..!");
+            }
+            catch (Exception ex)
+            {
+                return APIResponse<string>.FailureResponse("An unexpected error occurred while updating student status.");
+            }
         }
 
         public async Task<PaginatedResponse<StudentResponse>> GetAllStudentsAsync(StudentQueryParamters parameters)

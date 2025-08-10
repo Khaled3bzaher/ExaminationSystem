@@ -9,6 +9,8 @@ namespace Persistence.Repositories
     public class UnitOfWork(ExaminationDbContext context,IMapper mapper) : IUnitOfWork
     {
         private readonly Dictionary<string, object> _repositories = [];
+        private IStudentRepository? _studentRepository;
+
         public IGenericRepository<TEntity, TKey> GetRepository<TEntity, TKey>() where TEntity : BaseEntityPrimaryKey<TKey>
         {
             var typeName = typeof(TEntity).Name;
@@ -25,8 +27,9 @@ namespace Persistence.Repositories
 
         public async Task RollbackTransactionAsync() => await context.Database.RollbackTransactionAsync();
 
-        public void Dispose() => context.Dispose();
 
-        public IStudentRepository StudentRepository => new StudentRepository(context,mapper);
+        public async ValueTask DisposeAsync() => await context.DisposeAsync();
+
+        public IStudentRepository StudentRepository => _studentRepository ??= new StudentRepository(context,mapper);
     }
 }

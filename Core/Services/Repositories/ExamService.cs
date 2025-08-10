@@ -19,36 +19,53 @@ namespace Persistence.Repositories
                 return APIResponse<StudentExamResponse>.FailureResponse($"Subject with Id: {subjectId} Not Found..!", (int)HttpStatusCode.NotFound);
 
             var enteredBefore = await GetStudentSubjectExamRecord(studentId, subjectId);
-            if (enteredBefore is not null && enteredBefore.ExamStatus == ExamStatus.Success)
-                return APIResponse<StudentExamResponse>.FailureResponse($"You Already Had this Exam..!", (int)HttpStatusCode.Conflict);
-            else if(enteredBefore is not null && enteredBefore.ExamStatus == ExamStatus.NotCompleted)
-                unitOfWork.GetRepository<StudentExam, Guid>().Delete(enteredBefore);
-
-            if (!await QuestionNumbersIsValid(subjectId, configurations.QuestionNumbers))
-                return APIResponse<StudentExamResponse>.FailureResponse($"Cannot Request Exam Now, Contact the Administrator..!", (int)HttpStatusCode.InternalServerError);
-            else
+            using var transaction = await unitOfWork.BeginTransactionAsync();
+            try
             {
-                var allQuestions = await GenerateAllExamQuestions(configurations, subjectId);
-                if (allQuestions.Count() != configurations.QuestionNumbers)
+                if (enteredBefore is not null && enteredBefore.ExamStatus == ExamStatus.Success)
                 {
-                    var questionsIds = allQuestions.Select(x => x.Id).ToList();
-                    var remainQuestionsCount = configurations.QuestionNumbers - questionsIds.Count();
-                    var reminingQuestions = await GetRemainQuestions(remainQuestionsCount, subjectId, questionsIds);
-                    if (allQuestions.Count() + reminingQuestions.Count() != configurations.QuestionNumbers)
-                        return APIResponse<StudentExamResponse>.FailureResponse($"Cannot Request Exam Now, Contact the Administrator..!", (int)HttpStatusCode.InternalServerError);
-                    else
-                        allQuestions = allQuestions.Concat(reminingQuestions).OrderBy(x => Guid.NewGuid()).ToList();
+                    await transaction.RollbackAsync();
+                    return APIResponse<StudentExamResponse>.FailureResponse($"You Already Had this Exam..!", (int)HttpStatusCode.Conflict);
                 }
 
-                var studentExam = new StudentExam()
+                else if (enteredBefore is not null && enteredBefore.ExamStatus == ExamStatus.NotCompleted)
                 {
-                    StudentId = studentId,
-                    SubjectId = subjectId,
-                };
+                    unitOfWork.GetRepository<StudentExam, Guid>().Delete(enteredBefore);
+                    await unitOfWork.SaveChangesAsync();
+                }
+                if (!await QuestionNumbersIsValid(subjectId, configurations.QuestionNumbers))
+                {
+
+                    await transaction.RollbackAsync();
+                    
+                    return APIResponse<StudentExamResponse>.FailureResponse($"Cannot Request Exam Now, Contact the Administrator..!", (int)HttpStatusCode.InternalServerError);
+                }
                 
-                await unitOfWork.GetRepository<StudentExam, Guid>().AddAsync(studentExam);
-                if (await unitOfWork.SaveChangesAsync() > 0)
-                {
+                    var allQuestions = await GenerateAllExamQuestions(configurations, subjectId);
+                    if (allQuestions.Count() != configurations.QuestionNumbers)
+                    {
+                        var questionsIds = allQuestions.Select(x => x.Id).ToList();
+                        var remainQuestionsCount = configurations.QuestionNumbers - questionsIds.Count();
+                        var reminingQuestions = await GetRemainQuestions(remainQuestionsCount, subjectId, questionsIds);
+                        if (allQuestions.Count() + reminingQuestions.Count() != configurations.QuestionNumbers)
+                    {
+                        await transaction.RollbackAsync();
+
+                        return APIResponse<StudentExamResponse>.FailureResponse($"Cannot Request Exam Now, Contact the Administrator..!", (int)HttpStatusCode.InternalServerError);
+                    }
+                        
+                            allQuestions = allQuestions.Concat(reminingQuestions).OrderBy(x => Guid.NewGuid()).ToList();
+                    }
+
+                    var studentExam = new StudentExam()
+                    {
+                        StudentId = studentId,
+                        SubjectId = subjectId,
+                    };
+
+                    await unitOfWork.GetRepository<StudentExam, Guid>().AddAsync(studentExam);
+                    await unitOfWork.SaveChangesAsync();
+                    await transaction.CommitAsync();
                     var notification = await unitOfWork.GetRepository<StudentExam, Guid>().GetProjectedAsync<StartExamNotificationDTO>(new StudentsExamsSpecifications(studentId, subjectId));
 
                     var generatedExam = new StudentExamResponse()
@@ -61,11 +78,13 @@ namespace Persistence.Repositories
                     };
 
                     return APIResponse<StudentExamResponse>.SuccessResponse(generatedExam);
-                }
-                else
-                    return APIResponse<StudentExamResponse>.FailureResponse("Something went wrong While Request Exam..!");
-
+                
+            }catch(Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return APIResponse<StudentExamResponse>.FailureResponse("Something went wrong While Request Exam..!");
             }
+
         }
         public async Task<APIResponse<PaginatedResponse<ExamHistoryResponse>>> GetAllExamsHistory(ExamHistoryParameters parameters)
         {
@@ -133,22 +152,28 @@ namespace Persistence.Repositories
 
         public async Task<APIResponse<string>> SubmitExam(StudentExamDTO examDTO)
         {
-
-            var exam = await unitOfWork.GetRepository<StudentExam, Guid>().GetAsync(examDTO.ExamId);
-            if(exam == null)
-                return APIResponse<string>.FailureResponse("Cannot Submit this exam, Contact Administrator..!");
-            exam.SubmittedAt = examDTO.SubmittedAt;
-            exam.ExamQuestions = mapper.Map<ICollection<ExamQuestion>>(examDTO.Questions);
-            exam.ExamStatus = ExamStatus.Completed;
-            unitOfWork.GetRepository<StudentExam, Guid>().Update(exam);
-            if (await unitOfWork.SaveChangesAsync() > 0)
+            using var transaction = await unitOfWork.BeginTransactionAsync();
+            try
             {
+                var exam = await unitOfWork.GetRepository<StudentExam, Guid>().GetAsync(examDTO.ExamId);
+                if (exam == null)
+                    return APIResponse<string>.FailureResponse("Cannot Submit this exam, Contact Administrator..!");
+                exam.SubmittedAt = DateTime.Now;
+                exam.ExamQuestions = mapper.Map<ICollection<ExamQuestion>>(examDTO.Questions);
+                exam.ExamStatus = ExamStatus.Completed;
+                unitOfWork.GetRepository<StudentExam, Guid>().Update(exam);
+                var saveResult = await unitOfWork.SaveChangesAsync();
+                if (saveResult <= 0)
+                    return APIResponse<string>.FailureResponse("Something went wrong While Submitting Exam..!");
                 await rabbitMQ.PublishAsync(QueuesConstants.EXAMS_SUBMIT_QUEUE, examDTO);
-                Console.WriteLine($"Message Published to Queue:" + examDTO.ExamId);
+                await transaction.CommitAsync();
                 return APIResponse<string>.SuccessResponse($"Exam Submitted Successfully");
-            }
-            else
+
+            }catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
                 return APIResponse<string>.FailureResponse("Something went wrong While Submitting Exam..!");
+            }
         }
 
         public async Task<APIResponse<PreviewExamResponse>> PreviewExam(Guid examId, string? studentId)

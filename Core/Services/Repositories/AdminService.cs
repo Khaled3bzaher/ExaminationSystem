@@ -13,11 +13,11 @@ namespace Services.Repositories
             var examPassedCount = await unitOfWork.GetRepository<StudentExam, Guid>().CountAsync(specifications);
             specifications = new StudentsExamsCountSpecifications(ExamStatus.Failed);
             var examFailedCount = await unitOfWork.GetRepository<StudentExam, Guid>().CountAsync(specifications);
-            specifications = new StudentsExamsCountSpecifications(ExamStatus.Completed);
-            var examCompletedCount = await unitOfWork.GetRepository<StudentExam, Guid>().CountAsync(specifications);
+            specifications = new StudentsExamsCountSpecifications(ExamStatus.NotCompleted);
+            var examNotCompletedCount = await unitOfWork.GetRepository<StudentExam, Guid>().CountAsync(specifications);
             var statsResponse = new StatsResponse { 
                 StudentsNumber= studentsCount,
-                ExamCompleted = examCompletedCount,
+                ExamNotCompleted = examNotCompletedCount,
                 ExamFailed = examFailedCount,
                 ExamPassed = examPassedCount,
             }; 

@@ -30,7 +30,10 @@ namespace Services.MappingProfiles
                 .ForMember(d => d.Id, opt => opt.MapFrom(s => s.QuestionId))
                 .ForMember(d => d.Text, opt => opt.MapFrom(s => s.Question.Text))
                 .ForMember(d => d.Choices, opt => opt.MapFrom(s => s.Question.Choices))
-                
+                .ForMember(d=>d.CorrectAnswerId
+                ,opt=>opt.MapFrom(s=>s.Question.Choices
+                    .FirstOrDefault(c=>c.QuestionId==s.QuestionId && c.isCorrect)!.Id
+                ))
                 ;
 
             CreateMap<StudentExam, PreviewExamResponse>()

@@ -1,9 +1,6 @@
-﻿using Domain.Contracts;
-using Domain.Services;
+﻿using Domain.Services;
 using MongoDB.Driver;
-using Services.Specifications.Exams;
 using Services.Specifications.Notifications;
-using Shared.DTOs.Exams;
 using Shared.DTOs.Notifications;
 
 namespace Services.Repositories
@@ -20,8 +17,15 @@ namespace Services.Repositories
         }
         public async Task CreateNotification(NotificationDTO notification)
         {
+            try
+            {
             var Notification = _mapper.Map<Notification>(notification);
             await _repository.CreateAsync(Notification);
+
+            }catch(Exception ex)
+            {
+                throw new Exception("Failed to create notification", ex);
+            }
         }
 
         public async Task<APIResponse<PaginatedResponse<NotificationResponse>>> GetAllNotifications(NotificationParameters parameters)

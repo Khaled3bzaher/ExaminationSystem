@@ -3,7 +3,6 @@ using ExaminationSystem.Web.Factories;
 using ExaminationSystem.Web.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Shared.Authentication;
 using Shared.Options;
@@ -16,7 +15,6 @@ namespace ExaminationSystem.Web
     {
         public static IServiceCollection AddWebApplicationServices(this  IServiceCollection services,IConfiguration configuration)
         {
-            services.AddExceptionHandler<GlobalExceptionHandler>();
             services.AddSignalR();
 
             services.Configure<ApiBehaviorOptions>(options =>
@@ -47,7 +45,7 @@ namespace ExaminationSystem.Web
         {
             using var scope = app.Services.CreateScope();
             var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
-            await dbInitializer.InitializeAsync();
+            //await dbInitializer.InitializeAsync();
             return app;
         }
         private static void ConfigureJWT(IServiceCollection services,IConfiguration configuration)

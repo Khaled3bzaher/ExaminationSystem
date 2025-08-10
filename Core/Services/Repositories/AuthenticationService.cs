@@ -2,7 +2,7 @@
 
 namespace Services.Repositories
 {
-    internal class AuthenticationService(UserManager<ApplicationUser> userManager, IOptions<JWTOptions> jwtOptions) : IAuthenticationService
+    internal class AuthenticationService(UserManager<ApplicationUser> userManager, IUnitOfWork unitOfWork,IOptions<JWTOptions> jwtOptions) : IAuthenticationService
     {
         public async Task<bool> CheckEmailAsync(string email)
         => await userManager.FindByEmailAsync(email) != null;
@@ -25,28 +25,43 @@ namespace Services.Repositories
 
         public async Task<APIResponse<UserResponse>> RegisterAsync(RegisterRequest registerRequest)
         {
-            if (await userManager.Users.AnyAsync(u=>u.PhoneNumber == registerRequest.PhoneNumber))
+            using var transaction = await unitOfWork.BeginTransactionAsync();
+            try
             {
-                return APIResponse<UserResponse>.FailureResponse("Phone Number already exists", (int)HttpStatusCode.Conflict);
-            }
-            var user = new ApplicationUser
-            {
-                Email = registerRequest.Email,
-                FullName = registerRequest.Name,
-                PhoneNumber = registerRequest.PhoneNumber,
-                UserName = registerRequest.Email
-            };
-            var result = await userManager.CreateAsync(user,registerRequest.Password);
-            if (!result.Succeeded) {
-                var errors = result.Errors.Select(e => e.Description).ToList();
-                return APIResponse<UserResponse>.FailureResponse(errors.FirstOrDefault(), (int)HttpStatusCode.Conflict);
-            }
-            var roleResult = await userManager.AddToRoleAsync(user, AppRoles.STUDENT);
-            if (roleResult.Succeeded)
-                return APIResponse<UserResponse>.SuccessResponse(new UserResponse(registerRequest.Email, registerRequest.Name, await CreateTokenAsync(user)));
-           
+                if (await userManager.Users.AnyAsync(u => u.PhoneNumber == registerRequest.PhoneNumber))
+                {
+                    return APIResponse<UserResponse>.FailureResponse("Phone Number already exists", (int)HttpStatusCode.Conflict);
+                }
+                var user = new ApplicationUser
+                {
+                    Email = registerRequest.Email,
+                    FullName = registerRequest.Name,
+                    PhoneNumber = registerRequest.PhoneNumber,
+                    UserName = registerRequest.Email
+                };
+                var result = await userManager.CreateAsync(user, registerRequest.Password);
+                if (!result.Succeeded)
+                {
+                    var errors = result.Errors.Select(e => e.Description).ToList();
+                    return APIResponse<UserResponse>.FailureResponse(errors.FirstOrDefault(), (int)HttpStatusCode.Conflict);
+                }
+                var roleResult = await userManager.AddToRoleAsync(user, AppRoles.STUDENT);
+                if (!roleResult.Succeeded)
+                {
+                    await transaction.RollbackAsync();
+                    return APIResponse<UserResponse>.FailureResponse("Internal Server Error");
 
-            return APIResponse<UserResponse>.FailureResponse("Internal Server Error");
+                }
+
+                await transaction.CommitAsync();
+                return APIResponse<UserResponse>.SuccessResponse(new UserResponse(registerRequest.Email, registerRequest.Name, await CreateTokenAsync(user)));
+
+            }catch(Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return APIResponse<UserResponse>.FailureResponse("Internal Server Error");
+            }
+
         }
         private async Task<string> CreateTokenAsync(ApplicationUser user)
         {

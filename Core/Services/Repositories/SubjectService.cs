@@ -11,28 +11,36 @@ namespace Services.Repositories
     {
         public async Task<APIResponse<string>> CreateSubjectAsync(SubjectDTO subject)
         {
-            var subjectMap = mapper.Map<Subject>(subject);
-            subjectMap.ExamConfiguration = new ExamConfiguration();
-            await unitOfWork.GetRepository<Subject,Guid>().AddAsync(subjectMap);
-            if(await unitOfWork.SaveChangesAsync() >0)
-                return APIResponse<string>.SuccessResponse(null,message:$"Subject {subject.Name} Successfully Created");
-            else
+            try
+            {
+                var subjectMap = mapper.Map<Subject>(subject);
+                subjectMap.ExamConfiguration = new ExamConfiguration();
+                await unitOfWork.GetRepository<Subject, Guid>().AddAsync(subjectMap);
+                await unitOfWork.SaveChangesAsync();
+                return APIResponse<string>.SuccessResponse(null, message: $"Subject {subject.Name} Successfully Created");
+            }
+            catch (Exception ex)
+            {
                 return APIResponse<string>.FailureResponse("Something went wrong While Saving..!");
+            }
         }
 
         public async Task<APIResponse<string>> DeleteSubjectAsync(Guid subjectId)
         {
-            var subjectFound = await unitOfWork.GetRepository<Subject, Guid>().GetAsync(subjectId);
+            try
+            {
+                var subjectFound = await unitOfWork.GetRepository<Subject, Guid>().GetAsync(subjectId);
 
-            if (subjectFound == null)
-                return APIResponse<string>.FailureResponse($"Subject with Id: {subjectId} Not Found..!", (int)HttpStatusCode.NotFound);
+                if (subjectFound == null)
+                    return APIResponse<string>.FailureResponse($"Subject with Id: {subjectId} Not Found..!", (int)HttpStatusCode.NotFound);
 
-            unitOfWork.GetRepository<Subject, Guid>().Delete(subjectFound);
-
-            if (await unitOfWork.SaveChangesAsync() > 0)
+                unitOfWork.GetRepository<Subject, Guid>().Delete(subjectFound);
+                await unitOfWork.SaveChangesAsync();
                 return APIResponse<string>.SuccessResponse(null, message: $"Subject {subjectFound.Name} Successfully Deleted");
-            else
+            }catch (Exception ex)
+            {
                 return APIResponse<string>.FailureResponse("Something went wrong While Saving..!");
+            }
 
         }
 
@@ -77,32 +85,42 @@ namespace Services.Repositories
 
         public async Task<APIResponse<string>> UpdateSubjectAsync(Guid subjectId, SubjectDTO subject)
         {
-            var subjectFound = await unitOfWork.GetRepository<Subject, Guid>().GetAsync(subjectId);
-            if (subjectFound == null)
-                return APIResponse<string>.FailureResponse($"Subject with Id: {subjectId} Not Found..!", (int)HttpStatusCode.NotFound);
+            try
+            {
+                var subjectFound = await unitOfWork.GetRepository<Subject, Guid>().GetAsync(subjectId);
+                if (subjectFound == null)
+                    return APIResponse<string>.FailureResponse($"Subject with Id: {subjectId} Not Found..!", (int)HttpStatusCode.NotFound);
 
-            mapper.Map(subject, subjectFound);
+                mapper.Map(subject, subjectFound);
 
-            unitOfWork.GetRepository<Subject, Guid>().Update(subjectFound);
-
-            if (await unitOfWork.SaveChangesAsync() > 0)
+                unitOfWork.GetRepository<Subject, Guid>().Update(subjectFound);
+                await unitOfWork.SaveChangesAsync();
                 return APIResponse<string>.SuccessResponse(null, message: $"Subject {subject.Name} Successfully Updated");
-            else
+            }
+            catch (Exception ex)
+            {
                 return APIResponse<string>.FailureResponse("Something went wrong While Saving..!");
+            }
+
         }
 
         public async Task<APIResponse<string>> UpdateSubjectConfigurationAsync(Guid subjectId, SubjectConfigurationDTO configurationDTO)
         {
-            var configurationSpecification = new ExamConfigurationSpecifications(subjectId);
-            var subjectConfigurationFound = await unitOfWork.GetRepository<ExamConfiguration, int>().GetAsync(configurationSpecification);
-            if (subjectConfigurationFound == null)
-                return APIResponse<string>.FailureResponse($"Subject with Id: {subjectId} Not Found..!", (int)HttpStatusCode.NotFound);
-            mapper.Map(configurationDTO, subjectConfigurationFound);
-            unitOfWork.GetRepository<ExamConfiguration, int>().Update(subjectConfigurationFound);
-            if (await unitOfWork.SaveChangesAsync() > 0)
+            try
+            {
+                var configurationSpecification = new ExamConfigurationSpecifications(subjectId);
+                var subjectConfigurationFound = await unitOfWork.GetRepository<ExamConfiguration, int>().GetAsync(configurationSpecification);
+                if (subjectConfigurationFound == null)
+                    return APIResponse<string>.FailureResponse($"Subject with Id: {subjectId} Not Found..!", (int)HttpStatusCode.NotFound);
+                mapper.Map(configurationDTO, subjectConfigurationFound);
+                unitOfWork.GetRepository<ExamConfiguration, int>().Update(subjectConfigurationFound);
+                await unitOfWork.SaveChangesAsync();
                 return APIResponse<string>.SuccessResponse(null, message: $"Subject Configuration Successfully Updated");
-            else
+            }catch(Exception ex)
+            {
                 return APIResponse<string>.FailureResponse("Something went wrong While Saving..!");
+            }
+
         }
     }
 }

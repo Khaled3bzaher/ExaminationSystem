@@ -1,4 +1,5 @@
 using ExaminationSystem.Web.Hubs;
+using ExaminationSystem.Web.Middlewares;
 using Persentation.Messaging;
 using Persistence;
 using Services;
@@ -10,6 +11,7 @@ namespace ExaminationSystem.Web
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
             // Add services to the container.
             builder.Services.AddControllers();
@@ -27,6 +29,7 @@ namespace ExaminationSystem.Web
             
 
             var app = builder.Build();
+            app.UseExceptionHandler(_ => { });
             await app.InitializeDatabaseAsync();
             app.MapHub<ExamHub>("/examHub");
 

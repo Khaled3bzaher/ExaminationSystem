@@ -11,31 +11,40 @@ namespace Services.Repositories
     {
         public async Task<APIResponse<string>> CreateQuestionAsync(CreateQuestionDTO questionDTO)
         {
-            var subject = await unitOfWork.GetRepository<Subject,Guid>().isExists(questionDTO.SubjectId);
-            if(!subject)
-                return APIResponse<string>.FailureResponse($"Subject with Id: {questionDTO.SubjectId} Not Found..!", (int)HttpStatusCode.NotFound);
+            try
+            {
+                var subject = await unitOfWork.GetRepository<Subject, Guid>().isExists(questionDTO.SubjectId);
+                if (!subject)
+                    return APIResponse<string>.FailureResponse($"Subject with Id: {questionDTO.SubjectId} Not Found..!", (int)HttpStatusCode.NotFound);
 
-            var QuestionMap = mapper.Map<Question>(questionDTO);
-            await unitOfWork.GetRepository<Question, Guid>().AddAsync(QuestionMap);
-
-            if (await unitOfWork.SaveChangesAsync() > 0)
+                var QuestionMap = mapper.Map<Question>(questionDTO);
+                await unitOfWork.GetRepository<Question, Guid>().AddAsync(QuestionMap);
+                await unitOfWork.SaveChangesAsync();
                 return APIResponse<string>.SuccessResponse(null, message: $"Question Successfully Created");
-            else
+            }
+            catch (Exception ex)
+            {
                 return APIResponse<string>.FailureResponse("Something went wrong While Saving..!");
+            }
+                
         }
 
         public async Task<APIResponse<string>> DeleteQuestionAsync(Guid questionId)
         {
-            var question = await unitOfWork.GetRepository<Question,Guid>().GetAsync(questionId);
-            if(question is null)
-                return APIResponse<string>.FailureResponse($"Question with Id: {questionId} Not Found..!", (int)HttpStatusCode.NotFound);
+            try
+            {
+                var question = await unitOfWork.GetRepository<Question, Guid>().GetAsync(questionId);
+                if (question is null)
+                    return APIResponse<string>.FailureResponse($"Question with Id: {questionId} Not Found..!", (int)HttpStatusCode.NotFound);
 
-            unitOfWork.GetRepository<Question, Guid>().Delete(question);
-
-            if (await unitOfWork.SaveChangesAsync() > 0)
+                unitOfWork.GetRepository<Question, Guid>().Delete(question);
+                await unitOfWork.SaveChangesAsync();
                 return APIResponse<string>.SuccessResponse(null, message: $"Question {question.Text} Successfully Deleted");
-            else
+            }catch(Exception ex)
+            {
                 return APIResponse<string>.FailureResponse("Something went wrong While Saving..!");
+            }
+               
         }
 
         public async Task<PaginatedResponse<QuestionResponse>> GetAllQuestionsAsync(QuestionQueryParameters parameters)
